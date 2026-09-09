@@ -1,133 +1,503 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>byeokhae's Profile</title>
-    <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --accent-color: #4a90e2;
-            --shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 35px 25px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .profile-emoji {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-        h1 {
-            font-size: 24px;
-            margin: 10px 0 5px 0;
-            font-weight: 700;
-        }
-        .subtitle {
-            font-size: 14px;
-            color: #777;
-            margin-bottom: 25px;
-        }
-        .info-section {
-            text-align: left;
-            margin-top: 25px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .info-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--accent-color);
-        }
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .info-list li {
-            font-size: 15px;
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        .info-list li strong {
-            display: inline-block;
-            width: 80px;
-            color: #555;
-        }
-        .links {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .btn {
-            background-color: #f1f3f5;
-            color: #495057;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .btn:hover {
-            background-color: var(--accent-color);
-            color: white;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>해일 · info</title>
+<meta name="description" content="한바다 드림 계정 인포">
+<meta property="og:title" content="해일 · info">
+<meta property="og:description" content="11°22′N 142°35′E · 한바다 × 온새벽">
+<meta name="theme-color" content="#0C1723">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400&family=IBM+Plex+Mono:wght@300&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%235CB0BE'/></svg>">
+
+<style>
+/* ✏️ 색 (이 여섯 줄만 바꾸면 전체가 따라 바뀜) */
+:root{
+  --sea:#0C1723;
+  --ink:#B9C9D4;
+  --faint:#5E7381;
+  --hair:rgba(150,180,196,.30);
+  --grid:rgba(150,180,196,.12);
+  --current:#5CB0BE;                /* 해일 */
+  --dawn:#EBBB7C;                   /* 디유 — 수면의 금빛 */
+  --reach:#A9DA7E;                  /* 심해에 닿은 빛 — 연두 */
+  --mapw:min(40vw,440px);           /* 이동 후 지도 칸 너비 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  background:var(--sea);color:var(--ink);
+  font-family:"IBM Plex Sans KR",-apple-system,sans-serif;
+  font-weight:200;font-size:14px;line-height:2.05;letter-spacing:.06em;
+  padding:0 22px;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"IBM Plex Mono",monospace;font-weight:300}
+a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
+a:hover{border-color:var(--current)}
+
+/* ── 지도 칸: 기본 첫페이지(화면 전체 넓게) ── */
+.layer{
+  position:fixed;top:0;bottom:0;left:0;right:0;width:100%;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.layer svg{width:100%;height:auto;max-height:88vh;transition: width 0.8s ease}
+#bg{z-index:-5;opacity:var(--bgfade,1)}
+#track{z-index:-3}
+#inst{z-index:-1}
+
+/* 스크롤 시 우측으로 가로폭 좁게 이동하는 상태 */
+@media (min-width:900px){
+  body.scrolled .layer {
+    left: auto;
+    right: 34px;
+    width: var(--mapw);
+  }
+  body{
+    padding-left: 52px;
+    padding-right: calc(var(--mapw) + 52px);
+    transition: padding 0.8s ease;
+  }
+}
+
+.floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.surface{stroke:var(--hair);stroke-width:1;vector-effect:non-scaling-stroke}
+
+/* 찰랑이는 수면과 내리쬐는 빛 */
+.wave{fill:none;stroke:var(--hair);stroke-width:1.1;vector-effect:non-scaling-stroke;
+      transform-box:view-box;transform-origin:0 0}
+.wave.lit{stroke:var(--dawn);opacity:.34}
+@media (prefers-reduced-motion:no-preference){
+  .wave{animation:flow 13s linear infinite}
+  .wave.lit{animation:flow 9s linear infinite}
+  @keyframes flow{to{transform:translateX(-88px)}}
+}
+.gridline{stroke:var(--grid);stroke-width:.7;vector-effect:non-scaling-stroke}
+.lbl{font-family:"IBM Plex Sans KR",sans-serif;font-weight:300;font-size:11px;
+     letter-spacing:.22em;fill:var(--faint)}
+.num{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;fill:var(--faint)}
+
+.route{fill:none;stroke:var(--current);stroke-width:1.6;vector-effect:non-scaling-stroke;opacity:.75}
+.halo{fill:var(--dawn)}
+
+.stn{fill:var(--sea);stroke:var(--current);stroke-width:1.2;
+     vector-effect:non-scaling-stroke;opacity:.32;transition:opacity .4s ease}
+.stn.done{opacity:.9}
+.stnum{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;
+       fill:var(--faint);opacity:.55}
+
+.now{stroke:var(--current);stroke-width:.9;vector-effect:non-scaling-stroke;opacity:.5}
+.caret{fill:var(--current);opacity:.8}
+.read{font-family:"IBM Plex Mono",monospace;font-weight:300;letter-spacing:.14em;
+      font-size:15px;fill:#DCE8EE;
+      stroke:var(--sea);stroke-width:4;paint-order:stroke;stroke-linejoin:round}
+.read.sm{font-size:10.5px;fill:var(--faint);stroke-width:3.4}
+
+/* 우측 상단에서 비스듬히 내리쬐는 빛 */
+#warm{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+      opacity:0;transition:opacity .6s ease}
+.warm-in{position:absolute;inset:0}
+.warm-in::before{content:"";position:absolute;inset:0;opacity:.15;
+  background:radial-gradient(92vh 92vh at 106% -10%, var(--reach), transparent 60%)}
+.beam{position:absolute;top:-45vh;height:210vh;
+      background:linear-gradient(180deg,var(--reach),transparent 74%);
+      transform-origin:100% 0}
+.b1{right:-12vw;width:27vw;transform:rotate(27deg);filter:blur(52px);opacity:.11}
+.b2{right:5vw;  width:13vw;transform:rotate(35deg);filter:blur(40px);opacity:.09}
+.b3{right:19vw; width:7vw; transform:rotate(23deg);filter:blur(30px);opacity:.07}
+@media (prefers-reduced-motion:no-preference){
+  .warm-in{animation:reach 13s ease-in-out infinite}
+  @keyframes reach{0%,100%{opacity:.76}50%{opacity:1}}
+}
+
+/* ── 본문 영역 ── */
+.wrap{position:relative;z-index:1}
+.stage{min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;
+       display:flex;flex-direction:column;justify-content:center;padding:64px 0}
+.col{max-width:31rem;width:100%}
+
+.head{font-size:.76rem;letter-spacing:.24em;color:var(--faint);line-height:2.1;margin-bottom:42px}
+.head .id{color:var(--ink);font-size:1.1rem;letter-spacing:.34em;display:block;margin-bottom:10px}
+
+.stamp{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.68rem;
+       letter-spacing:.22em;color:var(--faint);margin-bottom:6px}
+.zone{font-size:.7rem;letter-spacing:.34em;color:var(--faint);margin-bottom:24px}
+.stage h2{font-size:1rem;font-weight:300;letter-spacing:.32em;margin-bottom:20px;
+          padding-bottom:14px;border-bottom:1px solid var(--hair)}
+@media (prefers-reduced-motion:no-preference){
+  .col{opacity:0;transition:opacity .9s ease}
+  .stage.in .col{opacity:1}
+}
+
+.spec{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.74rem;
+      letter-spacing:.16em;color:var(--faint);line-height:2.3;margin-bottom:16px}
+.body{font-size:.87rem;line-height:2.35}
+.go{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
+    letter-spacing:.3em;color:var(--faint);margin-top:40px;opacity:.8}
+
+.info{display:grid;grid-template-columns:6rem 1fr}
+.info dt{color:var(--faint);font-size:.78rem;padding:8px 0;border-bottom:1px solid var(--hair)}
+.info dd{padding:8px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
+.info dt:last-of-type,.info dd:last-of-type{border-bottom:none}
+
+.rules{margin-bottom:22px}
+.rules h3{font-size:.76rem;font-weight:300;letter-spacing:.2em;color:var(--faint);margin-bottom:6px}
+.rules ul{list-style:none}
+.rules li{position:relative;padding-left:1.5rem;font-size:.84rem;margin-bottom:3px}
+.rules li::before{position:absolute;left:0;top:0;font-size:.68rem}
+.ok li::before{content:"○";color:var(--current)}
+.no li::before{content:"✕";color:var(--faint)}
+
+.links{list-style:none}
+.links li{padding:7px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
+.links li:last-child{border-bottom:none}
+.links .label{color:var(--faint);font-size:.76rem;letter-spacing:.2em;display:inline-block;width:5.8rem}
+
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.tags span{font-size:.72rem;padding:2px 11px;border:1px solid var(--hair);border-radius:99px;color:var(--faint)}
+
+.floorsig{border-top:1px solid var(--hair);margin-top:28px;padding-top:20px;
+          font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
+          letter-spacing:.24em;color:var(--faint)}
+
+/* 좁은 화면에서는 지도가 글 뒤로 들어가고 옅어짐 */
+@media (max-width:899px){
+  .layer{left:0;right:0;width:auto !important}
+  .layer svg{width:min(100%,420px);max-height:82vh}
+  #bg{opacity:calc(var(--bgfade,1) * .5)}
+  #track{opacity:.85}
+}
+@media (max-width:520px){
+  body{padding:0 20px;font-size:13px}
+  .stage{padding:56px 0}
+  .info{grid-template-columns:5rem 1fr}
+  .opt{display:none}
+}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <div class="profile-card">
-        <!-- 상단 프로필 이모지 -->
-        <div class="profile-emoji">✨</div>
-        
-        <!-- 이름 및 한줄소개 -->
-        <h1>byeokhae</h1>
-        <div class="subtitle">여기에 저를 소개하는 멋진 한 줄 문구를 적어주세요!</div>
-        
-        <!-- 상세 정보 섹션 -->
-        <div class="info-section">
-            <div class="info-title">About Me</div>
-            <ul class="info-list">
-                <li><strong>Like</strong> 🎨 창작하기, ☕ 커피, 🎧 음악 감상</li>
-                <li><strong>Link</strong> 🔗 아래 버튼들을 눌러 이동해 보세요.</li>
-                <li><strong>TMI</strong> 💬 여기에 쓰고 싶은 말들을 자유롭게 적어보세요.</li>
-            </ul>
-        </div>
-        
-        <!-- 바로가기 링크 버튼들 -->
-        <div class="links">
-            <a href="#" class="btn" target="_blank">📸 인스타그램</a>
-            <a href="#" class="btn" target="_blank">📝 블로그 바로가기</a>
-            <a href="#" class="btn" target="_blank">✉️ 방명록 / 연락처</a>
-        </div>
-    </div>
+<!-- ── 배경 도면 ── -->
+<div class="layer" id="bg" aria-hidden="true">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+    <g class="gridline">
+      <line x1="76" y1="218" x2="430" y2="218"/>
+      <line x1="76" y1="346" x2="430" y2="346"/>
+      <line x1="76" y1="474" x2="430" y2="474"/>
+      <line x1="76" y1="602" x2="430" y2="602"/>
+      <line x1="76" y1="730" x2="430" y2="730"/>
+      <line x1="76" y1="90"  x2="76"  y2="820"/>
+    </g>
+    <g class="num">
+      <text x="6" y="93">0</text>
+      <text x="6" y="221">- 2 0 0 0</text>
+      <text x="6" y="349">- 4 0 0 0</text>
+      <text x="6" y="477">- 6 0 0 0</text>
+      <text x="6" y="605">- 8 0 0 0</text>
+      <text x="2" y="733">- 1 0 0 0 0</text>
+    </g>
+
+    <!-- 찰랑이는 수면 -->
+    <path class="wave" d="M-20 90 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <path class="wave lit" id="litwave"
+          d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <text class="lbl" x="330" y="76">해  수  면</text>
+
+    <path class="floorline"
+      d="M76 314 C 92 250, 112 110, 128 54 L 146 82
+         C 164 140, 190 250, 216 372 C 244 500, 276 650, 302 762
+         L 312 790 L 322 758 C 346 660, 372 540, 400 492
+         C 414 470, 424 466, 434 470"/>
+
+    <text class="lbl opt" x="150" y="40">마 리 아 나  열 도</text>
+    <text class="lbl opt" x="352" y="430">태  평  양  판</text>
+    <text class="lbl" x="196" y="822">챌 린 저  해 연</text>
+  </svg>
 </div>
 
+<!-- ── 항적 · 정거장 · 두 사람 ── -->
+<div class="layer" id="track" aria-hidden="true">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+    <path id="route" class="route"
+      d="M128 54 L 146 82 C 164 140, 190 250, 216 372
+         C 244 500, 276 650, 302 762 L 311 788"/>
+
+    <g id="stations"></g>
+
+    <circle class="halo" id="glow" cx="128" cy="54" r="46" opacity=".26"/>
+    <circle cx="128" cy="54" r="6" fill="var(--dawn)" id="dyu"/>
+    <circle id="hae" cx="311" cy="788" r="7" fill="var(--current)" opacity="0"/>
+  </svg>
+</div>
+
+<!-- ── 계기 ── -->
+<div class="layer" id="inst" aria-hidden="true">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+    <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
+    <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
+    <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
+    <text class="read sm" id="readp" x="82" y="108">1 B A R</text>
+    <circle id="subw" cx="128" cy="54" r="5" fill="var(--dawn)"/>
+    <circle id="sub" cx="128" cy="54" r="4.2" fill="#EAF3F6" opacity="0"/>
+  </svg>
+</div>
+
+<div id="warm">
+  <div class="warm-in">
+    <div class="beam b1"></div>
+    <div class="beam b2"></div>
+    <div class="beam b3"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ✏️ 해면 위 · 디유 -->
+  <section class="stage" data-depth="0">
+    <div class="col">
+      <p class="head">
+        <span class="id">닉네임</span>
+        한바다 드림 계정<br>
+        11°22′N 142°35′E · 마리아나 해구<br>
+        haeil.love
+      </p>
+      <p class="stamp">+ 0 5 7 0 M · 1 B A R</p>
+      <p class="zone">해  면  위</p>
+      <h2 style="color:var(--dawn)">디 유</h2>
+      <p class="spec">온새벽 · 풀 S급 가이드 · 빛과 대지</p>
+      <p class="body">가라앉는 것들을 아는 사람. 끌어올리지 않고 옆에 같이 앉아 있는 쪽을 택한다.</p>
+      <p class="go">정 거 장  네  곳  ·  아 래 로</p>
+    </div>
+  </section>
+
+  <!-- ✏️ 정거장 1 -->
+  <section class="stage" data-depth="200">
+    <div class="col">
+      <p class="stamp">S T - 0 1  ·  - 0 0 2 0 0 M  ·  2 1 B A R</p>
+      <p class="zone">표  층</p>
+      <h2>인 포</h2>
+      <dl class="info">
+        <dt>닉네임</dt><dd>○○ / ○</dd>
+        <dt>나이대</dt><dd>20대</dd>
+        <dt>최애</dt><dd>해일(한바다)</dd>
+        <dt>주 관심사</dt><dd>센티넬·가이드, 드림, 자캐</dd>
+        <dt>트윗</dt><dd>덕질 7 : 잡담 3</dd>
+        <dt>답장</dt><dd>느려요, 그래도 다 읽어요</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ✏️ 정거장 2 -->
+  <section class="stage" data-depth="1500">
+    <div class="col">
+      <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  · 1 5 1 B A R</p>
+      <p class="zone">점  심  해  층</p>
+      <h2>규 정</h2>
+      <div class="rules ok">
+        <h3>이런 건 편해요</h3>
+        <ul>
+          <li>말 없이 팔로우, 언팔, 뮤트 다 괜찮아요</li>
+          <li>리트윗이나 인용 자유롭게 해주세요</li>
+          <li>같은 커플링이면 반가워요, 편하게 말 걸어주세요</li>
+        </ul>
+      </div>
+      <div class="rules no">
+        <h3>이런 건 조심해줘요</h3>
+        <ul>
+          <li>디유 설정이나 글을 무단으로 가져가는 것</li>
+          <li>다른 커플링 얘기를 멘션으로 보내는 것</li>
+          <li>제 계정을 다른 곳에 언급하며 옮기는 것</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✏️ 정거장 3 -->
+  <section class="stage" data-depth="6000">
+    <div class="col">
+      <p class="stamp">S T - 0 3  ·  - 0 6 0 0 0 M  ·  6 0 3 B A R</p>
+      <p class="zone">심  해  층</p>
+      <h2>링 크</h2>
+      <ul class="links">
+        <li><span class="label">트위터</span><a href="https://twitter.com/" target="_blank" rel="noopener">@아이디</a></li>
+        <li><span class="label">포스타입</span><a href="#" target="_blank" rel="noopener">글 모아둔 곳</a></li>
+        <li><span class="label">마시멜로</span><a href="#" target="_blank" rel="noopener">익명으로 말 걸기</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ✏️ 정거장 4 -->
+  <section class="stage" data-depth="10935">
+    <div class="col">
+      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  · 1 0 8 6 B A R  · 1 ~ 4 ℃</p>
+      <p class="zone">초  심  해  대</p>
+      <h2 style="color:var(--current)">해 일</h2>
+      <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
+      <p class="body">
+        감각이 닿는 범위를 재보라는 말을 들으면 웃는다. 재본 적이 없어서가 아니라,
+        재려고 들면 늘 물이 먼저 끝났기 때문에.
+      </p>
+      <p class="body" style="margin-top:22px">
+        한바다는 자기 감각이 어디까지 뻗어 있는지 세어본 적이 없다. 셀 필요가 없었으니까.
+        온새벽이 손을 얹은 날에야 처음으로, 물이 여기서 끝난다는 걸 알았다.
+      </p>
+      <div class="tags">
+        <span>심해 × 새벽</span><span>각인</span><span>쌍방구원</span><span>느린 연애</span>
+      </div>
+      <p class="floorsig">해 저  도  달  ·  haeil.love</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var MAX=10935,
+      rd=document.getElementById('read'),
+      rp=document.getElementById('readp'),
+      caret=document.getElementById('caret'),
+      warm=document.getElementById('warm'),
+      route=document.getElementById('route'),
+      sub=document.getElementById('sub'),
+      subw=document.getElementById('subw'),
+      warm=document.getElementById('warm'),
+      litwave=document.getElementById('litwave'),
+      now=document.getElementById('now'),
+      glow=document.getElementById('glow'),
+      dyu=document.getElementById('dyu'),
+      hae=document.getElementById('hae'),
+      stnBox=document.getElementById('stations'),
+      stages=[].slice.call(document.querySelectorAll('.stage')),
+      depths=stages.map(function(s){return +s.dataset.depth}),
+      LEN=route.getTotalLength(),
+      NS='http://www.w3.org/2000/svg',
+      marks=[],tick=false;
+
+  route.style.strokeDasharray=LEN;
+  route.style.strokeDashoffset=LEN;
+
+  function pad(n){var s=String(n);while(s.length<5)s='0'+s;return s.split('').join(' ')}
+  function clamp(v){return v<0?0:v>1?1:v}
+  function yOf(dep){return 90+(dep/MAX)*700}
+
+  /* 수심에 따른 물빛. 수면의 푸른빛에서 심해의 검정까지 */
+  var TINT=[[0,[18,50,68]],[2000,[10,29,42]],[10935,[3,7,12]]],
+      root=document.documentElement;
+  function seaAt(dep){
+    var i=0;
+    while(i<TINT.length-2&&dep>TINT[i+1][0])i++;
+    var a=TINT[i],b=TINT[i+1],
+        t=clamp((dep-a[0])/(b[0]-a[0])),
+        c=[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t)});
+    return 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+  }
+
+  function seek(targetY){
+    var lo=0,hi=LEN,mid=0,p;
+    for(var i=0;i<22;i++){
+      mid=(lo+hi)/2;p=route.getPointAtLength(mid);
+      if(p.y<targetY)lo=mid;else hi=mid;
+    }
+    return{len:mid,p:route.getPointAtLength(mid)};
+  }
+
+  depths.forEach(function(d,i){
+    if(i===0)return;
+    var s=seek(yOf(d)),
+        c=document.createElementNS(NS,'circle'),
+        t=document.createElementNS(NS,'text');
+    c.setAttribute('cx',s.p.x);c.setAttribute('cy',s.p.y);
+    c.setAttribute('r',5.4);c.setAttribute('class','stn');
+    t.setAttribute('x',s.p.x+11);t.setAttribute('y',s.p.y+4);
+    t.setAttribute('class','stnum');
+    t.textContent='0'+i;
+    stnBox.appendChild(c);stnBox.appendChild(t);
+    marks.push({el:c,d:d});
+  });
+
+  function depthNow(){
+    var y=window.scrollY;
+    for(var i=stages.length-1;i>=0;i--){
+      var top=stages[i].offsetTop;
+      if(y>=top-2){
+        if(i===stages.length-1)return depths[i];
+        var span=stages[i+1].offsetTop-top;
+        var t=span>0?clamp((y-top)/span):0;
+        return depths[i]+(depths[i+1]-depths[i])*t;
+      }
+    }
+    return depths[0];
+  }
+
+  function upd(){
+    var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
+
+    /* 첫 번째 구간(수면 위)을 벗어나면 지도를 우측으로 이동시키는 클래스 toggle */
+    if(dep > 50) {
+      document.body.classList.add('scrolled');
+    } else {
+      document.body.classList.remove('scrolled');
+    }
+
+    rd.textContent='- '+pad(Math.round(dep))+' M';
+    rd.setAttribute('y',y-12);
+    rp.textContent=String(Math.round(1+dep*0.0992)).split('').join(' ')+' B A R';
+    rp.setAttribute('y',y+20);
+
+    now.setAttribute('y1',y);now.setAttribute('y2',y);
+    /* 수면에서는 커서선을 감춰서 물결과 겹치지 않게 */
+    now.style.opacity=(clamp(dep/260)*0.5).toFixed(3);
+    caret.setAttribute('transform','translate(0,'+y+')');
+
+    root.style.setProperty('--sea',seaAt(dep));
+    root.style.setProperty('--bgfade',(1-r*0.45).toFixed(3));
+    route.style.strokeDashoffset=LEN-s.len;
+    sub.setAttribute('cx',s.p.x);sub.setAttribute('cy',s.p.y);
+    subw.setAttribute('cx',s.p.x);subw.setAttribute('cy',s.p.y);
+
+    /* 표식은 수면에서 주황, 내려가면서 차갑게 식는다 */
+    var cool=clamp(dep/1400);
+    sub.setAttribute('opacity',cool.toFixed(3));
+    subw.setAttribute('opacity',(1-cool).toFixed(3));
+
+    /* 수면의 금빛 물결은 900m쯤에서 사라짐 */
+    var lit=clamp(1-dep/900);
+    litwave.setAttribute('opacity',(lit*0.34).toFixed(3));
+
+    /* 그리고 바닥 가까이에서, 글 쪽으로 연두빛이 번진다 */
+    var reach=clamp((dep-6600)/(MAX-6600));
+    warm.style.opacity=Math.pow(reach,1.7).toFixed(3);
+
+    glow.setAttribute('opacity',(0.26*(1-r*0.9)).toFixed(3));
+    dyu.setAttribute('opacity',(1-r*0.55).toFixed(3));
+    hae.setAttribute('opacity',clamp((r-0.72)/0.24).toFixed(3));
+
+    marks.forEach(function(m){m.el.classList.toggle('done',dep>=m.d-1)});
+
+    tick=false;
+  }
+
+  window.addEventListener('scroll',function(){
+    if(!tick){tick=true;requestAnimationFrame(upd)}
+  },{passive:true});
+  window.addEventListener('resize',upd);
+  upd();
+
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})
+    },{threshold:.25});
+    stages.forEach(function(s){io.observe(s)});
+  }else{
+    stages.forEach(function(s){s.classList.add('in')});
+  }
+})();
+</script>
 </body>
 </html>
