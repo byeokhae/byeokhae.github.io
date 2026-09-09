@@ -7,77 +7,85 @@
 <meta name="description" content="한바다 드림 계정 인포">
 <meta property="og:title" content="해일 · info">
 <meta property="og:description" content="11°22′N 142°35′E · 한바다 × 온새벽">
-<meta name="theme-color" content="#0C1723">
+<meta name="theme-color" content="#EBF4F8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400&family=IBM+Plex+Mono:wght@300&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%235CB0BE'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%2338788A'/></svg>">
 
 <style>
-/* ✏️ 색 및 기본 레이아웃 변수 */
+/* ✏️ 색상 및 레이아웃 변수 (수면 기준: 옅은 하늘색 배경 + 짙은 텍스트) */
 :root{
-  --sea:#0C1723;
-  --ink:#B9C9D4;
-  --faint:#5E7381;
-  --hair:rgba(150,180,196,.30);
-  --grid:rgba(150,180,196,.12);
-  --current:#5CB0BE;               /* 해일 */
-  --dawn:#EBBB7C;                  /* 디유 — 수면의 금빛 */
-  --reach:#A9DA7E;                 /* 심해에 닿은 빛 — 연두 */
-  --mapw:min(40vw,440px);          /* 왼쪽 레이아웃 표준 너비 */
+  --sea: #EBF4F8;                  /* 시작: 옅은 하늘색 */
+  --ink: #1C2D37;                  /* 시작: 짙은 흑청색 글자 */
+  --faint: #526B7A;                /* 라벨/보조 텍스트 */
+  --hair: rgba(28, 45, 55, 0.25);  /* 선 색상 */
+  --grid: rgba(28, 45, 55, 0.12);  /* 모눈선 */
+  --current: #2B7A8B;              /* 해일 - 포인트 컬러 */
+  --dawn: #C88330;                 /* 디유 - 오렌지/금빛 */
+  --reach: #6AA53B;                /* 심해 빛 */
+  --mapw: min(40vw, 440px);
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
 
 html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 body{
-  background:var(--sea);color:var(--ink);
-  font-family:"IBM Plex Sans KR",-apple-system,sans-serif;
-  font-weight:200;font-size:14px;line-height:2.05;letter-spacing:.06em;
-  padding:0 22px;-webkit-font-smoothing:antialiased;
+  background-color: var(--sea);
+  color: var(--ink);
+  font-family: "IBM Plex Sans KR", -apple-system, sans-serif;
+  font-weight: 200; font-size: 14px; line-height: 2.05; letter-spacing: .06em;
+  padding: 0 22px;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s linear, color 0.4s linear;
 }
+
 .mono{font-family:"IBM Plex Mono",monospace;font-weight:300}
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 단일 SVG 레이어 고정 및 화면비 원본 유지 ── */
+/* ── 단일 SVG 레이어 고정 및 좌측 슬라이드 애니메이션 ── */
 .map-container{
-  position:fixed;
-  top:0;
-  bottom:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center; /* 메인 화면에서는 중앙 정렬 */
-  pointer-events:none;
-  overflow:hidden;
+  position: fixed;
+  top: 0; bottom: 0; left: 0; right: 0;
+  width: 100vw; height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
   z-index: 0;
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), justify-content 0.8s ease;
-  will-change: width;
 }
 
-/* 스크롤을 내리면 좌측 440px 영역으로 축소 및 왼쪽 정렬 */
-.map-container.shrunk{
-  width: var(--mapw);
-  justify-content: flex-start;
-}
-
-.map-container svg{
-  width: auto;
+/* 중앙에서 좌측 영역으로 이동하는 부드러운 애니메이션 연출 */
+.map-inner{
+  width: min(100vw, 440px);
   height: 90vh;
-  max-width: 100%;
-  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(0);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* 스크롤 다운 시 좌측 정렬 상태로 스무스하게 이동 */
+.map-container.shrunk .map-inner{
+  transform: translateX(calc(-50vw + var(--mapw) / 2 + 20px));
+}
+
+.map-inner svg{
+  width: 100%;
+  height: 100%;
 }
 
 .floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
 
-/* 찰랑이는 수면 */
+/* 파도 효과 */
 .wave{fill:none;stroke:var(--hair);stroke-width:1.1;vector-effect:non-scaling-stroke;
       transform-box:view-box;transform-origin:0 0}
-.wave.lit{stroke:var(--dawn);opacity:.34}
+.wave.lit{stroke:var(--dawn);opacity:.5}
 @media (prefers-reduced-motion:no-preference){
   .wave{animation:flow 13s linear infinite}
   .wave.lit{animation:flow 9s linear infinite}
@@ -88,23 +96,23 @@ a:hover{border-color:var(--current)}
      letter-spacing:.22em;fill:var(--faint)}
 .num{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;fill:var(--faint)}
 
-.route{fill:none;stroke:var(--current);stroke-width:1.6;vector-effect:non-scaling-stroke;opacity:.75}
+.route{fill:none;stroke:var(--current);stroke-width:1.6;vector-effect:non-scaling-stroke;opacity:.85}
 .halo{fill:var(--dawn)}
 
 .stn{fill:var(--sea);stroke:var(--current);stroke-width:1.2;
-     vector-effect:non-scaling-stroke;opacity:.32;transition:opacity .4s ease}
-.stn.done{opacity:.9}
+     vector-effect:non-scaling-stroke;opacity:.4;transition:opacity .4s ease}
+.stn.done{opacity:1}
 .stnum{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;
-       fill:var(--faint);opacity:.55}
+       fill:var(--faint);opacity:.7}
 
 .now{stroke:var(--current);stroke-width:.9;vector-effect:non-scaling-stroke;opacity:.5}
 .caret{fill:var(--current);opacity:.8}
 .read{font-family:"IBM Plex Mono",monospace;font-weight:300;letter-spacing:.14em;
-      font-size:15px;fill:#DCE8EE;
+      font-size:15px;fill:var(--ink);
       stroke:var(--sea);stroke-width:4;paint-order:stroke;stroke-linejoin:round}
 .read.sm{font-size:10.5px;fill:var(--faint);stroke-width:3.4}
 
-/* 심해조명 이펙트 */
+/* 심해 조명 이펙트 */
 #warm{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
       opacity:0;transition:opacity .6s ease}
 .warm-in{position:absolute;inset:0}
@@ -171,14 +179,14 @@ a:hover{border-color:var(--current)}
           font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
           letter-spacing:.24em;color:var(--faint)}
 
-/* 데스크탑 여백 설정 */
+/* 데스크탑 및 큰 화면 전용 배치 */
 @media (min-width:900px){
   body{padding-left:calc(var(--mapw) + 52px);padding-right:34px}
 }
-/* 모바일 및 작은 화면 설정 */
+/* 모바일 반응형 처리 */
 @media (max-width:899px){
-  .map-container{left:0;right:0;width:100%!important}
-  .map-container svg{width:min(100%,420px);max-height:82vh}
+  .map-container.shrunk .map-inner{transform:translateX(0)}
+  .map-inner{width:min(100vw,420px)}
 }
 @media (max-width:520px){
   body{padding:0 20px;font-size:13px}
@@ -190,62 +198,64 @@ a:hover{border-color:var(--current)}
 </head>
 <body>
 
-<!-- ── 단일 SVG (비율 파손 방지 meet 옵션 적용) ── -->
+<!-- ── 부드럽게 왼쪽으로 이동하는 SVG 래퍼 ── -->
 <div class="map-container" id="mapContainer" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
-    <!-- 1. 그리드 및 깊이 수치 -->
-    <g class="gridline">
-      <line x1="76" y1="218" x2="430" y2="218"/>
-      <line x1="76" y1="346" x2="430" y2="346"/>
-      <line x1="76" y1="474" x2="430" y2="474"/>
-      <line x1="76" y1="602" x2="430" y2="602"/>
-      <line x1="76" y1="730" x2="430" y2="730"/>
-      <line x1="76" y1="90"  x2="76"  y2="820"/>
-    </g>
-    <g class="num">
-      <text x="6" y="93">0</text>
-      <text x="6" y="221">- 2 0 0 0</text>
-      <text x="6" y="349">- 4 0 0 0</text>
-      <text x="6" y="477">- 6 0 0 0</text>
-      <text x="6" y="605">- 8 0 0 0</text>
-      <text x="2" y="733">- 1 0 0 0 0</text>
-    </g>
+  <div class="map-inner">
+    <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+      <!-- 1. 그리드 및 깊이 수치 -->
+      <g class="gridline">
+        <line x1="76" y1="218" x2="430" y2="218"/>
+        <line x1="76" y1="346" x2="430" y2="346"/>
+        <line x1="76" y1="474" x2="430" y2="474"/>
+        <line x1="76" y1="602" x2="430" y2="602"/>
+        <line x1="76" y1="730" x2="430" y2="730"/>
+        <line x1="76" y1="90"  x2="76"  y2="820"/>
+      </g>
+      <g class="num">
+        <text x="6" y="93">0</text>
+        <text x="6" y="221">- 2 0 0 0</text>
+        <text x="6" y="349">- 4 0 0 0</text>
+        <text x="6" y="477">- 6 0 0 0</text>
+        <text x="6" y="605">- 8 0 0 0</text>
+        <text x="2" y="733">- 1 0 0 0 0</text>
+      </g>
 
-    <!-- 2. 수면 파도 -->
-    <path class="wave" d="M-20 90 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-    <path class="wave lit" id="litwave" d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-    <text class="lbl" x="330" y="76">해  수  면</text>
+      <!-- 2. 수면 파도 -->
+      <path class="wave" d="M-20 90 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+      <path class="wave lit" id="litwave" d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+      <text class="lbl" x="330" y="76">해  수  면</text>
 
-    <!-- 3. 해저 지형 단면선 -->
-    <path class="floorline"
-      d="M76 314 C 92 250, 112 110, 128 54 L 146 82
-         C 164 140, 190 250, 216 372 C 244 500, 276 650, 302 762
-         L 312 790 L 322 758 C 346 660, 372 540, 400 492
-         C 414 470, 424 466, 434 470"/>
+      <!-- 3. 해저 지형 단면선 -->
+      <path class="floorline"
+        d="M76 314 C 92 250, 112 110, 128 54 L 146 82
+           C 164 140, 190 250, 216 372 C 244 500, 276 650, 302 762
+           L 312 790 L 322 758 C 346 660, 372 540, 400 492
+           C 414 470, 424 466, 434 470"/>
 
-    <text class="lbl opt" x="150" y="40">마 리 아 나  열 도</text>
-    <text class="lbl opt" x="352" y="430">태  평  양  판</text>
-    <text class="lbl" x="196" y="822">챌 린 저  해 연</text>
+      <text class="lbl opt" x="150" y="40">마 리 아 나  열 도</text>
+      <text class="lbl opt" x="352" y="430">태  평  양  판</text>
+      <text class="lbl" x="196" y="822">챌 린 저  해 연</text>
 
-    <!-- 4. 항적 경로 및 정거장 -->
-    <path id="route" class="route"
-      d="M128 54 L 146 82 C 164 140, 190 250, 216 372
-         C 244 500, 276 650, 302 762 L 311 788"/>
+      <!-- 4. 항적 경로 및 정거장 -->
+      <path id="route" class="route"
+        d="M128 54 L 146 82 C 164 140, 190 250, 216 372
+           C 244 500, 276 650, 302 762 L 311 788"/>
 
-    <g id="stations"></g>
+      <g id="stations"></g>
 
-    <circle class="halo" id="glow" cx="128" cy="54" r="46" opacity=".26"/>
-    <circle cx="128" cy="54" r="6" fill="var(--dawn)" id="dyu"/>
-    <circle id="hae" cx="311" cy="788" r="7" fill="var(--current)" opacity="0"/>
+      <circle class="halo" id="glow" cx="128" cy="54" r="46" opacity=".26"/>
+      <circle cx="128" cy="54" r="6" fill="var(--dawn)" id="dyu"/>
+      <circle id="hae" cx="311" cy="788" r="7" fill="var(--current)" opacity="0"/>
 
-    <!-- 5. 실시간 동적 수치 및 포인터 -->
-    <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
-    <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
-    <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
-    <text class="read sm" id="readp" x="82" y="108">1 B A R</text>
-    <circle id="subw" cx="128" cy="54" r="5" fill="var(--dawn)"/>
-    <circle id="sub" cx="128" cy="54" r="4.2" fill="#EAF3F6" opacity="0"/>
-  </svg>
+      <!-- 5. 실시간 동적 수치 및 포인터 -->
+      <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
+      <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
+      <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
+      <text class="read sm" id="readp" x="82" y="108">1 B A R</text>
+      <circle id="subw" cx="128" cy="54" r="5" fill="var(--dawn)"/>
+      <circle id="sub" cx="128" cy="54" r="4.2" fill="#EAF3F6" opacity="0"/>
+    </svg>
+  </div>
 </div>
 
 <div id="warm">
@@ -258,11 +268,11 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ── 0. 첫 번째 커버 섹션 ── -->
+  <!-- ── 0. 첫 번째 메인 커버 섹션 ── -->
   <section class="stage" data-depth="0">
   </section>
 
-  <!-- ✏️ 1. 스크롤 시 나오는 첫 본문 (디유) -->
+  <!-- ✏️ 1. 첫 본문 (디유) -->
   <section class="stage" data-depth="0">
     <div class="col">
       <p class="head">
@@ -301,7 +311,7 @@ a:hover{border-color:var(--current)}
   <section class="stage" data-depth="1500">
     <div class="col">
       <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  ·  1 5 1 B A R</p>
-      <p class="zone">점  심 {해}  층</p>
+      <p class="zone">점 {해}  층</p>
       <h2>규 정</h2>
       <div class="rules ok">
         <h3>이런 건 편해요</h3>
@@ -390,15 +400,32 @@ a:hover{border-color:var(--current)}
   function clamp(v){return v<0?0:v>1?1:v}
   function yOf(dep){return 90+(dep/MAX)*700}
 
-  var TINT=[[0,[18,50,68]],[2000,[10,29,42]],[10935,[3,7,12]]],
-      root=document.documentElement;
-  function seaAt(dep){
-    var i=0;
-    while(i<TINT.length-2&&dep>TINT[i+1][0])i++;
-    var a=TINT[i],b=TINT[i+1],
-        t=clamp((dep-a[0])/(b[0]-a[0])),
-        c=[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t)});
-    return 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+  /* 🎨 수심별 배경, 글자, 라인 색상 그라데이션 테이블 */
+  var COLOR_STAGES = [
+    { dep: 0,     bg: [235, 244, 248], ink: [28, 45, 55],   faint: [82, 107, 122], current: [43, 122, 139] },  /* 0m: 옅은 하늘색 배경, 짙은 텍스트 */
+    { dep: 2000,  bg: [22, 48, 66],    ink: [210, 226, 235], faint: [110, 140, 158], current: [92, 176, 190] },  /* 중간 수심: 파란색 진입 */
+    { dep: 10935, bg: [7, 16, 24],     ink: [185, 201, 212], faint: [94, 115, 129],  current: [92, 176, 190] }   /* 심해: 짙은 남색 배경, 밝은 텍스트 */
+  ];
+
+  var root = document.documentElement;
+
+  function interpolateColor(dep) {
+    var i = 0;
+    while (i < COLOR_STAGES.length - 2 && dep > COLOR_STAGES[i + 1].dep) i++;
+    var a = COLOR_STAGES[i], b = COLOR_STAGES[i + 1];
+    var t = clamp((dep - a.dep) / (b.dep - a.dep));
+
+    var bg = a.bg.map(function(v, k){ return Math.round(v + (b.bg[k] - v) * t); });
+    var ink = a.ink.map(function(v, k){ return Math.round(v + (b.ink[k] - v) * t); });
+    var faint = a.faint.map(function(v, k){ return Math.round(v + (b.faint[k] - v) * t); });
+    var current = a.current.map(function(v, k){ return Math.round(v + (b.current[k] - v) * t); });
+
+    root.style.setProperty('--sea', 'rgb(' + bg.join(',') + ')');
+    root.style.setProperty('--ink', 'rgb(' + ink.join(',') + ')');
+    root.style.setProperty('--faint', 'rgb(' + faint.join(',') + ')');
+    root.style.setProperty('--current', 'rgb(' + current.join(',') + ')');
+    root.style.setProperty('--hair', 'rgba(' + ink.join(',') + ', 0.25)');
+    root.style.setProperty('--grid', 'rgba(' + ink.join(',') + ', 0.12)');
   }
 
   function seek(targetY){
@@ -445,7 +472,7 @@ a:hover{border-color:var(--current)}
     var scrollY = window.scrollY;
     var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
 
-    /* 첫 화면에서는 중앙에 온전한 크기로 보이다가 스크롤하면 좌측 440px 영역으로 이동 */
+    /* 첫 스크롤 시 좌측으로 부드럽게 이동 트랜지션 클래스 토글 */
     if (scrollY > firstStageHeight * 0.1) {
       mapContainer.classList.add('shrunk');
     } else {
@@ -453,6 +480,8 @@ a:hover{border-color:var(--current)}
     }
 
     var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
+
+    interpolateColor(dep);
 
     rd.textContent='- '+pad(Math.round(dep))+' M';
     rd.setAttribute('y',y-12);
@@ -463,8 +492,6 @@ a:hover{border-color:var(--current)}
     now.style.opacity=(clamp(dep/260)*0.5).toFixed(3);
     caret.setAttribute('transform','translate(0,'+y+')');
 
-    var chartIn=clamp((dep-60)/140);
-    root.style.setProperty('--sea',seaAt(dep));
     route.style.strokeDashoffset=LEN-s.len;
     sub.setAttribute('cx',s.p.x);sub.setAttribute('cy',s.p.y);
     subw.setAttribute('cx',s.p.x);subw.setAttribute('cy',s.p.y);
@@ -474,7 +501,7 @@ a:hover{border-color:var(--current)}
     subw.setAttribute('opacity',(1-cool).toFixed(3));
 
     var lit=clamp(1-dep/900);
-    litwave.setAttribute('opacity',(lit*0.34).toFixed(3));
+    litwave.setAttribute('opacity',(lit*0.5).toFixed(3));
 
     var reach=clamp((dep-6600)/(MAX-6600));
     warm.style.opacity=Math.pow(reach,1.7).toFixed(3);
