@@ -190,6 +190,29 @@ body{
   transform:translateY(-50%);
 }
 
+/* 정거장 표시 · 가운데가 빈 동그라미 */
+
+.axis .st{
+  position:absolute;
+
+  left:-5px;
+
+  width:11px;
+  height:11px;
+
+  border-radius:50%;
+
+  border:1px solid var(--current);
+
+  background:transparent;
+
+  opacity:.55;
+
+  transform:translate(0,-50%);
+}
+
+/* 현재 위치 · 정거장에 도착하면 빈 동그라미 안에 들어감 */
+
 .axis .mk{
   position:absolute;
 
@@ -963,7 +986,8 @@ body.intro-ready .hud{
   transition:opacity 1.8s ease 1.05s;
 }
 
-  /* ─────────────────────────────
+
+/* ─────────────────────────────
    심해에 닿은 빛
 ───────────────────────────── */
 
@@ -1057,6 +1081,7 @@ body.intro-ready .hud{
   }
 
 }
+
 
 /* ─────────────────────────────
    심해 부유물
@@ -1313,7 +1338,7 @@ body.intro-ready .hud{
 
 <body class="intro-pending">
 
-  <div id="abyss-light" aria-hidden="true">
+<div id="abyss-light" aria-hidden="true">
   <span class="r1"></span>
   <span class="r2"></span>
   <span class="r3"></span>
@@ -1401,6 +1426,15 @@ body.intro-ready .hud{
   <b style="top:100%">
     - 1 0 9 3 5
   </b>
+
+
+  <!-- 정거장 세 곳 · 0m / -5500m / -9500m -->
+
+  <span class="st" style="top:0%"></span>
+
+  <span class="st" style="top:50.3%"></span>
+
+  <span class="st" style="top:86.9%"></span>
 
 
   <span
@@ -1517,16 +1551,16 @@ body.intro-ready .hud{
 </header>
 
 
-<!-- -8400m -->
+<!-- -5500m -->
 
 <section
   class="blk log-page"
-  data-depth="8400"
+  data-depth="5500"
   data-color-depth="0"
 >
 
   <p class="stamp">
-    - 0 8 4 0 0 M · 8 3 4 B A R · 1 ~ 4 ℃
+    - 0 5 5 0 0 M · 5 4 7 B A R · 1 ~ 4 ℃
   </p>
 
 
@@ -1557,17 +1591,17 @@ body.intro-ready .hud{
 </section>
 
 
-<!-- -10000m -->
+<!-- -9500m -->
 
 <section
   class="blk account-page"
-  data-depth="10000"
+  data-depth="9500"
 >
 
   <div class="account-panel">
 
     <p class="stamp">
-      - 1 0 0 0 0 M
+      - 0 9 5 0 0 M
     </p>
 
 
@@ -1848,7 +1882,7 @@ body.intro-ready .hud{
   /* ─────────────────────────────
      수심별 색
 
-     current = 제목, 링크, 로그 왼쪽 선, 수심축 마커에 쓰이는 강조색.
+     current = 제목, 링크, 로그 왼쪽 선, 수심축 표시에 쓰이는 강조색.
      밝은 수면에서는 진한 청록, 심해로 갈수록 밝은 청록.
   ───────────────────────────── */
 
@@ -1949,7 +1983,7 @@ body.intro-ready .hud{
     },
 
 
-    /* -8400m에서 사용하는 색 */
+    /* 더 깊은 곳 */
 
     {
 
@@ -3026,6 +3060,11 @@ body.intro-ready .hud{
 })();
 </script>
 
+
+<!-- ─────────────────────────────
+     심해에 닿은 빛
+───────────────────────────── -->
+
 <script>
 (function(){
 
@@ -3058,6 +3097,6 @@ body.intro-ready .hud{
 
 })();
 </script>
-  
+
 </body>
 </html>
