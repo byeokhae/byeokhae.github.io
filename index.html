@@ -23,7 +23,7 @@
   --current: #2B7A8B;
   --dawn: #C88330;
   --reach: #6AA53B;
-  --mapw: min(45vw, 520px);
+  --mapw: min(46vw, 540px);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -45,7 +45,7 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 화면 고정 SVG 컨테이너 (가로형 배치) ── */
+/* ── 화면 고정 SVG 컨테이너 ── */
 .map-container{
   position: fixed;
   top: 0; bottom: 0; left: 0; right: 0;
@@ -58,7 +58,7 @@ a:hover{border-color:var(--current)}
 }
 
 .map-inner{
-  width: min(85vw, 860px);
+  width: min(88vw, 900px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,7 +69,7 @@ a:hover{border-color:var(--current)}
 
 .map-container.shrunk .map-inner{
   width: var(--mapw);
-  transform: translateX(calc(-50vw + var(--mapw) / 2 + 30px));
+  transform: translateX(calc(-50vw + var(--mapw) / 2 + 35px));
 }
 
 .map-inner svg{
@@ -177,7 +177,7 @@ a:hover{border-color:var(--current)}
           letter-spacing:.24em;color:var(--faint)}
 
 @media (min-width:900px){
-  body{padding-left:calc(var(--mapw) + 60px);padding-right:34px}
+  body{padding-left:calc(var(--mapw) + 65px);padding-right:34px}
 }
 @media (max-width:899px){
   body{padding:0 20px;font-size:13px}
@@ -192,59 +192,59 @@ a:hover{border-color:var(--current)}
 
 <div class="map-container" id="mapContainer" aria-hidden="true">
   <div class="map-inner">
-    <!-- ✏️ 원래 가로형 비율인 900x440 뷰박스로 복원 -->
+    <!-- ✏️ 원래의 넓은 가로형 뷰박스 및 올바른 좌표계 복원 -->
     <svg viewBox="0 0 900 440" preserveAspectRatio="xMidYMid meet">
-      <!-- 1. 그리드 및 깊이 수치 -->
+      <!-- 1. 그리드 및 깊이 수치 (가로형 구조) -->
       <g class="gridline">
-        <line x1="90" y1="90"  x2="860" y2="90"/>
-        <line x1="90" y1="150" x2="860" y2="150"/>
-        <line x1="90" y1="210" x2="860" y2="210"/>
-        <line x1="90" y1="270" x2="860" y2="270"/>
-        <line x1="90" y1="330" x2="860" y2="330"/>
-        <line x1="90" y1="50"  x2="90"  y2="380"/>
+        <line x1="100" y1="100" x2="840" y2="100"/>
+        <line x1="100" y1="165" x2="840" y2="165"/>
+        <line x1="100" y1="230" x2="840" y2="230"/>
+        <line x1="100" y1="295" x2="840" y2="295"/>
+        <line x1="100" y1="360" x2="840" y2="360"/>
+        <line x1="100" y1="80"  x2="100"  y2="400"/>
       </g>
       <g class="num">
-        <text x="35" y="93">0</text>
-        <text x="22" y="153">- 2 0 0 0</text>
-        <text x="22" y="213">- 4 0 0 0</text>
-        <text x="22" y="273">- 6 0 0 0</text>
-        <text x="22" y="333">- 8 0 0 0</text>
-        <text x="14" y="393">- 1 0 0 0 0</text>
+        <text x="45" y="103">0</text>
+        <text x="32" y="168">- 2 0 0 0</text>
+        <text x="32" y="233">- 4 0 0 0</text>
+        <text x="32" y="298">- 6 0 0 0</text>
+        <text x="32" y="363">- 8 0 0 0</text>
+        <text x="24" y="420">- 1 0 0 0 0</text>
       </g>
 
       <!-- 2. 수면 파도 -->
-      <path class="wave" d="M50 50 q25 -4 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0"/>
-      <path class="wave lit" id="litwave" d="M50 53 q25 -5 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0"/>
-      <text class="lbl" x="720" y="38">해  수  면</text>
+      <path class="wave" d="M60 80 q25 -4 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0"/>
+      <path class="wave lit" id="litwave" d="M60 83 q25 -5 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0"/>
+      <text class="lbl" x="710" y="66">해  수  면</text>
 
-      <!-- 3. 해저 지형 단면선 (가로형 좌표계) -->
+      <!-- 3. 해저 지형 단면선 (가로형 곡선 복원) -->
       <path class="floorline"
-        d="M90 70 C 180 65, 240 50, 300 45 L 320 60
-           C 360 120, 440 220, 520 290 C 600 360, 680 395, 760 380
-           L 780 375 L 800 360
-           C 820 340, 840 250, 850 200"/>
+        d="M100 95 C 180 90, 240 82, 290 80 L 315 95
+           C 350 130, 420 200, 490 270 C 570 350, 660 395, 730 385
+           L 750 380 L 775 365
+           C 800 340, 825 240, 835 180"/>
 
-      <text class="lbl opt" x="220" y="30">마 리 아 나  열 도</text>
-      <text class="lbl opt" x="650" y="350">태  평  양  판</text>
-      <text class="lbl" x="420" y="415">챌 린 저  해 연</text>
+      <text class="lbl opt" x="200" y="55">마 리 아 나  열 도</text>
+      <text class="lbl opt" x="620" y="360">태  평  양  판</text>
+      <text class="lbl" x="400" y="420">챌 린 저  해 연</text>
 
       <!-- 4. 항적 경로 및 정거장 -->
       <path id="route" class="route"
-        d="M300 45 L 320 60 C 360 120, 440 220, 520 290 C 600 360, 680 395, 760 380 L 780 375"/>
+        d="M290 80 L 315 95 C 350 130, 420 200, 490 270 C 570 350, 660 395, 730 385 L 750 380"/>
 
       <g id="stations"></g>
 
-      <circle class="halo" id="glow" cx="300" cy="45" r="35" opacity=".26"/>
-      <circle cx="300" cy="45" r="5.5" fill="var(--dawn)" id="dyu"/>
-      <circle id="hae" cx="780" cy="375" r="6.5" fill="var(--current)" opacity="0"/>
+      <circle class="halo" id="glow" cx="290" cy="80" r="35" opacity=".26"/>
+      <circle cx="290" cy="80" r="5.5" fill="var(--dawn)" id="dyu"/>
+      <circle id="hae" cx="750" cy="380" r="6.5" fill="var(--current)" opacity="0"/>
 
       <!-- 5. 실시간 동적 수치 및 포인터 -->
-      <line class="now" id="now" x1="90" y1="50" x2="860" y2="50"/>
-      <path class="caret" id="caret" d="M74 -5 L86 0 L74 5 Z" transform="translate(0,50)"/>
-      <text class="read" id="read" x="95" y="42">- 0 0 0 0 0 M</text>
-      <text class="read sm" id="readp" x="95" y="62">1 B A R</text>
-      <circle id="subw" cx="300" cy="45" r="4.5" fill="var(--dawn)"/>
-      <circle id="sub" cx="300" cy="45" r="3.8" fill="#EAF3F6" opacity="0"/>
+      <line class="now" id="now" x1="100" y1="80" x2="840" y2="80"/>
+      <path class="caret" id="caret" d="M84 -5 L96 0 L84 5 Z" transform="translate(0,80)"/>
+      <text class="read" id="read" x="105" y="72">- 0 0 0 0 0 M</text>
+      <text class="read sm" id="readp" x="105" y="92">1 B A R</text>
+      <circle id="subw" cx="290" cy="80" r="4.5" fill="var(--dawn)"/>
+      <circle id="sub" cx="290" cy="80" r="3.8" fill="#EAF3F6" opacity="0"/>
     </svg>
   </div>
 </div>
@@ -381,7 +381,7 @@ a:hover{border-color:var(--current)}
 
   function pad(n){var s=String(n);while(s.length<5)s='0'+s;return s.split('').join(' ')}
   function clamp(v){return v<0?0:v>1?1:v}
-  function yOf(dep){return 50+(dep/MAX)*300}
+  function yOf(dep){return 80+(dep/MAX)*300}
 
   var COLOR_STAGES = [
     { dep: 0,     bg: [235, 244, 248], ink: [28, 45, 55],   faint: [82, 107, 122], current: [43, 122, 139] },
