@@ -7,526 +7,2796 @@
 <meta name="description" content="한바다 드림 계정 인포">
 <meta property="og:title" content="해일 · info">
 <meta property="og:description" content="11°22′N 142°35′E · 한바다 × 온새벽">
-<meta name="theme-color" content="#EBF4F8">
+<meta name="theme-color" content="#0C1723">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400&family=IBM+Plex+Mono:wght@300&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%2338788A'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%235CB0BE'/></svg>">
 
 <style>
-/* ✏️ 색상 및 레이아웃 변수 */
+/* ✏️ 색 (이 여섯 줄만 바꾸면 전체가 따라 바뀜) */
 :root{
-  --sea: #EBF4F8;                    /* 시작: 옅은 하늘색 */
-  --ink: #1C2D37;                    /* 시작: 짙은 흑청색 글자 */
-  --faint: #526B7A;                  /* 라벨/보조 텍스트 */
-  --hair: rgba(28, 45, 55, 0.25);  /* 선 색상 */
-  --grid: rgba(28, 45, 55, 0.12);  /* 모눈선 */
-  --current: #2B7A8B;                /* 해일 - 포인트 컬러 */
-  --dawn: #C88330;                   /* 디유 - 오렌지/금빛 */
-  --reach: #6AA53B;                  /* 심해 빛 */
-  --mapw: min(40vw, 440px);
+  --sea:#0C1723;
+  --ink:#B9C9D4;
+  --faint:#5E7381;
+  --hair:rgba(150,180,196,.30);
+  --grid:rgba(150,180,196,.12);
+  --current:#5CB0BE;                /* 해일 */
+  --dawn:#EBBB7C;                   /* 디유 — 수면의 금빛 */
+  --reach:#A9DA7E;                  /* 심해에 닿은 빛 — 연두 */
+  --mapw:min(40vw,440px);           /* 왼쪽 지도 칸 너비 */
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html{
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+}
 
 body{
-  background-color: var(--sea);
-  color: var(--ink);
-  font-family: "IBM Plex Sans KR", -apple-system, sans-serif;
-  font-weight: 200; font-size: 14px; line-height: 2.05; letter-spacing: .06em;
-  padding: 0 22px;
-  -webkit-font-smoothing: antialiased;
-  transition: background-color 0.4s linear, color 0.4s linear;
+  background:var(--sea);
+  color:var(--ink);
+  font-family:"IBM Plex Sans KR",-apple-system,sans-serif;
+  font-weight:200;
+  font-size:14px;
+  line-height:2.05;
+  letter-spacing:.06em;
+  padding:0 22px;
+  -webkit-font-smoothing:antialiased;
 }
 
-.mono{font-family:"IBM Plex Mono",monospace;font-weight:300}
-a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
-a:hover{border-color:var(--current)}
-
-/* ── 화면 고정 SVG 컨테이너 ── */
-.map-container{
-  position: fixed;
-  top: 0; bottom: 0; left: 0; right: 0;
-  width: 100vw; height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
+.mono{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
 }
 
-/* ✏️ 메인화면(넓음) -> 첫 스크롤 시 좁아지며 좌측 이동(애니메이션 적용) */
-.map-inner{
-  width: min(85vw, 1000px);
-  height: 85vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(0);
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: width, transform;
+a{
+  color:var(--current);
+  text-decoration:none;
+  border-bottom:1px solid var(--hair);
 }
 
-/* 첫 스크롤 발생 시 클래스가 붙으며 폭이 줄어들고 좌측으로 이동 */
-.map-container.shrunk .map-inner{
-  width: var(--mapw);
-  transform: translateX(calc(-50vw + var(--mapw) / 2 + 20px));
+a:hover{
+  border-color:var(--current);
 }
 
-.map-inner svg{
-  width: 100%;
-  height: 100%;
+
+/* ─────────────────────────────────
+   첫 화면의 넓은 단면도
+        ↓ 첫 번째 스크롤
+   좌측 고정 단면도
+───────────────────────────────── */
+
+#chartMorph{
+  position:fixed;
+  left:0;
+  top:0;
+
+  width:720px;
+  height:430px;
+
+  pointer-events:none;
+  overflow:visible;
+
+  z-index:0;
+
+  will-change:left,top,width,height;
 }
 
-.floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.chart-pane,
+.compact-layer{
+  position:absolute;
+  inset:0;
 
-/* 파도 효과 */
-.wave{fill:none;stroke:var(--hair);stroke-width:1.1;vector-effect:non-scaling-stroke;
-      transform-box:view-box;transform-origin:0 0}
-.wave.lit{stroke:var(--dawn);opacity:.5}
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.chart-pane{
+  transition:opacity .12s linear;
+}
+
+
+/* 첫 화면 가로형 그래프 */
+.hero-pane{
+  opacity:var(--herofade,1);
+}
+
+.hero-pane svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+
+/* 첫 스크롤 이후 세로형 그래프 */
+.compact-pane{
+  opacity:var(--compactfade,0);
+}
+
+.compact-layer svg{
+  width:100%;
+  height:auto;
+  max-height:88vh;
+  display:block;
+}
+
+#bg{
+  z-index:0;
+  opacity:var(--bgfade,1);
+}
+
+#track{
+  z-index:1;
+  opacity:var(--fgfade,1);
+}
+
+#inst{
+  z-index:2;
+  opacity:var(--fgfade,1);
+}
+
+
+.floorline{
+  fill:none;
+  stroke:var(--hair);
+  stroke-width:1.4;
+  vector-effect:non-scaling-stroke;
+}
+
+.surface{
+  stroke:var(--hair);
+  stroke-width:1;
+  vector-effect:non-scaling-stroke;
+}
+
+
+/* ── 찰랑이는 수면과 내리쬐는 빛 ── */
+
+.wave{
+  fill:none;
+  stroke:var(--hair);
+  stroke-width:1.1;
+  vector-effect:non-scaling-stroke;
+
+  transform-box:view-box;
+  transform-origin:0 0;
+}
+
+.wave.lit{
+  stroke:var(--dawn);
+  opacity:.34;
+}
+
 @media (prefers-reduced-motion:no-preference){
-  .wave{animation:flow 13s linear infinite}
-  .wave.lit{animation:flow 9s linear infinite}
-  @keyframes flow{to{transform:translateX(-88px)}}
+
+  .wave{
+    animation:flow 13s linear infinite;
+  }
+
+  .wave.lit{
+    animation:flow 9s linear infinite;
+  }
+
+  @keyframes flow{
+    to{
+      transform:translateX(-88px);
+    }
+  }
 }
-.gridline{stroke:var(--grid);stroke-width:.7;vector-effect:non-scaling-stroke}
-.lbl{font-family:"IBM Plex Sans KR",sans-serif;font-weight:300;font-size:11px;
-     letter-spacing:.22em;fill:var(--faint)}
-.num{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;fill:var(--faint)}
 
-.route{fill:none;stroke:var(--current);stroke-width:1.6;vector-effect:non-scaling-stroke;opacity:.85}
-.halo{fill:var(--dawn)}
 
-.stn{fill:var(--sea);stroke:var(--current);stroke-width:1.2;
-     vector-effect:non-scaling-stroke;opacity:.4;transition:opacity .4s ease}
-.stn.done{opacity:1}
-.stnum{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;
-       fill:var(--faint);opacity:.7}
+.gridline{
+  stroke:var(--grid);
+  stroke-width:.7;
+  vector-effect:non-scaling-stroke;
+}
 
-.now{stroke:var(--current);stroke-width:.9;vector-effect:non-scaling-stroke;opacity:.5}
-.caret{fill:var(--current);opacity:.8}
-.read{font-family:"IBM Plex Mono",monospace;font-weight:300;letter-spacing:.14em;
-      font-size:15px;fill:var(--ink);
-      stroke:var(--sea);stroke-width:4;paint-order:stroke;stroke-linejoin:round}
-.read.sm{font-size:10.5px;fill:var(--faint);stroke-width:3.4}
+.lbl{
+  font-family:"IBM Plex Sans KR",sans-serif;
+  font-weight:300;
+  font-size:11px;
+  letter-spacing:.22em;
+  fill:var(--faint);
+}
 
-/* 심해 조명 이펙트 */
-#warm{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-      opacity:0;transition:opacity .6s ease}
-.warm-in{position:absolute;inset:0}
-.warm-in::before{content:"";position:absolute;inset:0;opacity:.15;
-  background:radial-gradient(92vh 92vh at 106% -10%, var(--reach), transparent 60%)}
-.beam{position:absolute;top:-45vh;height:210vh;
-      background:linear-gradient(180deg,var(--reach),transparent 74%);
-      transform-origin:100% 0}
-.b1{right:-12vw;width:27vw;transform:rotate(27deg);filter:blur(52px);opacity:.11}
-.b2{right:5vw;  width:13vw;transform:rotate(35deg);filter:blur(40px);opacity:.09}
-.b3{right:19vw; width:7vw; transform:rotate(23deg);filter:blur(30px);opacity:.07}
+.num{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:10px;
+  letter-spacing:.14em;
+  fill:var(--faint);
+}
+
+
+.route{
+  fill:none;
+  stroke:var(--current);
+  stroke-width:1.6;
+  vector-effect:non-scaling-stroke;
+  opacity:.75;
+}
+
+.halo{
+  fill:var(--dawn);
+}
+
+
+.stn{
+  fill:var(--sea);
+  stroke:var(--current);
+  stroke-width:1.2;
+  vector-effect:non-scaling-stroke;
+  opacity:.32;
+  transition:opacity .4s ease;
+}
+
+.stn.done{
+  opacity:.9;
+}
+
+.stnum{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:9px;
+  letter-spacing:.12em;
+  fill:var(--faint);
+  opacity:.55;
+}
+
+
+.now{
+  stroke:var(--current);
+  stroke-width:.9;
+  vector-effect:non-scaling-stroke;
+  opacity:.5;
+}
+
+.caret{
+  fill:var(--current);
+  opacity:.8;
+}
+
+.read{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
+  letter-spacing:.14em;
+  font-size:15px;
+
+  fill:#DCE8EE;
+  stroke:var(--sea);
+  stroke-width:4;
+
+  paint-order:stroke;
+  stroke-linejoin:round;
+}
+
+.read.sm{
+  font-size:10.5px;
+  fill:var(--faint);
+  stroke-width:3.4;
+}
+
+
+/* ── 우측 상단에서 비스듬히 내리쬐는 빛 ── */
+
+#warm{
+  position:fixed;
+  inset:0;
+  z-index:0;
+
+  pointer-events:none;
+  overflow:hidden;
+
+  opacity:0;
+  transition:opacity .6s ease;
+}
+
+.warm-in{
+  position:absolute;
+  inset:0;
+}
+
+.warm-in::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  opacity:.15;
+
+  background:
+    radial-gradient(
+      92vh 92vh at 106% -10%,
+      var(--reach),
+      transparent 60%
+    );
+}
+
+.beam{
+  position:absolute;
+  top:-45vh;
+  height:210vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--reach),
+      transparent 74%
+    );
+
+  transform-origin:100% 0;
+}
+
+.b1{
+  right:-12vw;
+  width:27vw;
+  transform:rotate(27deg);
+  filter:blur(52px);
+  opacity:.11;
+}
+
+.b2{
+  right:5vw;
+  width:13vw;
+  transform:rotate(35deg);
+  filter:blur(40px);
+  opacity:.09;
+}
+
+.b3{
+  right:19vw;
+  width:7vw;
+  transform:rotate(23deg);
+  filter:blur(30px);
+  opacity:.07;
+}
+
 @media (prefers-reduced-motion:no-preference){
-  .warm-in{animation:reach 13s ease-in-out infinite}
-  @keyframes reach{0%,100%{opacity:.76}50%{opacity:1}}
+
+  .warm-in{
+    animation:reach 13s ease-in-out infinite;
+  }
+
+  @keyframes reach{
+    0%,100%{
+      opacity:.76;
+    }
+
+    50%{
+      opacity:1;
+    }
+  }
 }
 
-/* ── 본문 레이아웃 ── */
-.wrap{position:relative;z-index:1}
-.stage{min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;
-       display:flex;flex-direction:column;justify-content:center;padding:64px 0}
-.col{max-width:31rem;width:100%}
 
-.head{font-size:.76rem;letter-spacing:.24em;color:var(--faint);line-height:2.1;margin-bottom:42px}
-.head .id{color:var(--ink);font-size:1.1rem;letter-spacing:.34em;display:block;margin-bottom:10px}
+/* ─────────────────────────────────
+   본문
+───────────────────────────────── */
 
-.stamp{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.68rem;
-       letter-spacing:.22em;color:var(--faint);margin-bottom:6px}
-.zone{font-size:.7rem;letter-spacing:.34em;color:var(--faint);margin-bottom:24px}
-.stage h2{font-size:1rem;font-weight:300;letter-spacing:.32em;margin-bottom:20px;
-          padding-bottom:14px;border-bottom:1px solid var(--hair)}
+.wrap{
+  position:relative;
+  z-index:1;
+}
+
+.stage{
+  min-height:100svh;
+
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  padding:64px 0;
+}
+
+.col{
+  max-width:31rem;
+  width:100%;
+}
+
+
+/* 첫 화면은 그래프가 중심이 되도록
+   본문을 화면 상단 중앙에 배치 */
+
+.stage:first-child{
+  justify-content:flex-start;
+  padding-top:7vh;
+}
+
+.stage:first-child .col{
+  max-width:36rem;
+  margin:0 auto;
+  text-align:center;
+}
+
+.stage:first-child .head{
+  margin-bottom:18px;
+}
+
+.stage:first-child .go{
+  margin-top:24px;
+}
+
+
+.head{
+  font-size:.76rem;
+  letter-spacing:.24em;
+  color:var(--faint);
+  line-height:2.1;
+  margin-bottom:42px;
+}
+
+.head .id{
+  color:var(--ink);
+  font-size:1.1rem;
+  letter-spacing:.34em;
+  display:block;
+  margin-bottom:10px;
+}
+
+
+.stamp{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
+  font-size:.68rem;
+  letter-spacing:.22em;
+  color:var(--faint);
+  margin-bottom:6px;
+}
+
+.zone{
+  font-size:.7rem;
+  letter-spacing:.34em;
+  color:var(--faint);
+  margin-bottom:24px;
+}
+
+.stage h2{
+  font-size:1rem;
+  font-weight:300;
+  letter-spacing:.32em;
+
+  margin-bottom:20px;
+  padding-bottom:14px;
+
+  border-bottom:1px solid var(--hair);
+}
+
+
 @media (prefers-reduced-motion:no-preference){
-  .col{opacity:0;transition:opacity .9s ease}
-  .stage.in .col{opacity:1}
+
+  .col{
+    opacity:0;
+    transition:opacity .9s ease;
+  }
+
+  .stage.in .col{
+    opacity:1;
+  }
 }
 
-.spec{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.74rem;
-      letter-spacing:.16em;color:var(--faint);line-height:2.3;margin-bottom:16px}
-.body{font-size:.87rem;line-height:2.35}
-.go{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
-    letter-spacing:.3em;color:var(--faint);margin-top:40px;opacity:.8}
 
-.info{display:grid;grid-template-columns:6rem 1fr}
-.info dt{color:var(--faint);font-size:.78rem;padding:8px 0;border-bottom:1px solid var(--hair)}
-.info dd{padding:8px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
-.info dt:last-of-type,.info dd:last-of-type{border-bottom:none}
+.spec{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
 
-.rules{margin-bottom:22px}
-.rules h3{font-size:.76rem;font-weight:300;letter-spacing:.2em;color:var(--faint);margin-bottom:6px}
-.rules ul{list-style:none}
-.rules li{position:relative;padding-left:1.5rem;font-size:.84rem;margin-bottom:3px}
-.rules li::before{position:absolute;left:0;top:0;font-size:.68rem}
-.ok li::before{content:"○";color:var(--current)}
-.no li::before{content:"✕";color:var(--faint)}
+  font-size:.74rem;
+  letter-spacing:.16em;
+  color:var(--faint);
 
-.links{list-style:none}
-.links li{padding:7px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
-.links li:last-child{border-bottom:none}
-.links .label{color:var(--faint);font-size:.76rem;letter-spacing:.2em;display:inline-block;width:5.8rem}
+  line-height:2.3;
+  margin-bottom:16px;
+}
 
-.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
-.tags span{font-size:.72rem;padding:2px 11px;border:1px solid var(--hair);border-radius:99px;color:var(--faint)}
+.body{
+  font-size:.87rem;
+  line-height:2.35;
+}
 
-.floorsig{border-top:1px solid var(--hair);margin-top:28px;padding-top:20px;
-          font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
-          letter-spacing:.24em;color:var(--faint)}
+.go{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
 
-/* 데스크탑 여백 설정 (shrunk 상태와 일치) */
+  font-size:.66rem;
+  letter-spacing:.3em;
+  color:var(--faint);
+
+  margin-top:40px;
+  opacity:.8;
+}
+
+
+/* ── 인포 ── */
+
+.info{
+  display:grid;
+  grid-template-columns:6rem 1fr;
+}
+
+.info dt{
+  color:var(--faint);
+  font-size:.78rem;
+
+  padding:8px 0;
+
+  border-bottom:1px solid var(--hair);
+}
+
+.info dd{
+  padding:8px 0;
+  border-bottom:1px solid var(--hair);
+  font-size:.84rem;
+}
+
+.info dt:last-of-type,
+.info dd:last-of-type{
+  border-bottom:none;
+}
+
+
+/* ── 규정 ── */
+
+.rules{
+  margin-bottom:22px;
+}
+
+.rules h3{
+  font-size:.76rem;
+  font-weight:300;
+  letter-spacing:.2em;
+
+  color:var(--faint);
+
+  margin-bottom:6px;
+}
+
+.rules ul{
+  list-style:none;
+}
+
+.rules li{
+  position:relative;
+
+  padding-left:1.5rem;
+
+  font-size:.84rem;
+  margin-bottom:3px;
+}
+
+.rules li::before{
+  position:absolute;
+  left:0;
+  top:0;
+
+  font-size:.68rem;
+}
+
+.ok li::before{
+  content:"○";
+  color:var(--current);
+}
+
+.no li::before{
+  content:"✕";
+  color:var(--faint);
+}
+
+
+/* ── 링크 ── */
+
+.links{
+  list-style:none;
+}
+
+.links li{
+  padding:7px 0;
+  border-bottom:1px solid var(--hair);
+  font-size:.84rem;
+}
+
+.links li:last-child{
+  border-bottom:none;
+}
+
+.links .label{
+  color:var(--faint);
+
+  font-size:.76rem;
+  letter-spacing:.2em;
+
+  display:inline-block;
+  width:5.8rem;
+}
+
+
+/* ── 태그 ── */
+
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+
+  margin-top:20px;
+}
+
+.tags span{
+  font-size:.72rem;
+
+  padding:2px 11px;
+
+  border:1px solid var(--hair);
+  border-radius:99px;
+
+  color:var(--faint);
+}
+
+
+.floorsig{
+  border-top:1px solid var(--hair);
+
+  margin-top:28px;
+  padding-top:20px;
+
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
+  font-size:.66rem;
+  letter-spacing:.24em;
+
+  color:var(--faint);
+}
+
+
+/* ─────────────────────────────────
+   PC
+   첫 화면은 전체 폭 사용
+   두 번째 섹션부터 좌측 지도 + 우측 글
+───────────────────────────────── */
+
 @media (min-width:900px){
-  body{padding-left:calc(var(--mapw) + 52px);padding-right:34px}
+
+  body{
+    padding:0 22px;
+  }
+
+  .stage:not(:first-child){
+    padding-left:calc(var(--mapw) + 52px);
+    padding-right:34px;
+  }
 }
+
+
+/* ─────────────────────────────────
+   태블릿 / 모바일
+───────────────────────────────── */
+
 @media (max-width:899px){
-  body{padding:0 20px;font-size:13px}
-  .stage{padding:56px 0}
-  .info{grid-template-columns:5rem 1fr}
-  .opt{display:none}
-  .map-container.shrunk .map-inner{transform:translateX(0)}
+
+  .compact-layer svg{
+    width:min(100%,420px);
+    max-height:82vh;
+  }
+
+  #bg{
+    opacity:calc(var(--bgfade,1) * .5);
+  }
+
+  #track,
+  #inst{
+    opacity:calc(var(--fgfade,1) * .9);
+  }
+
+  .stage:first-child{
+    padding-left:18px;
+    padding-right:18px;
+  }
 }
+
+
+@media (max-width:520px){
+
+  body{
+    padding:0 20px;
+    font-size:13px;
+  }
+
+  .stage{
+    padding-top:56px;
+    padding-bottom:56px;
+  }
+
+  .stage:first-child{
+    padding-top:5vh;
+  }
+
+  .stage:first-child .head{
+    margin-bottom:12px;
+  }
+
+  .stage:first-child .zone{
+    margin-bottom:14px;
+  }
+
+  .stage:first-child h2{
+    margin-bottom:12px;
+    padding-bottom:10px;
+  }
+
+  .stage:first-child .spec{
+    margin-bottom:10px;
+  }
+
+  .stage:first-child .go{
+    margin-top:16px;
+  }
+
+  .info{
+    grid-template-columns:5rem 1fr;
+  }
+
+  .opt{
+    display:none;
+  }
+}
+
 </style>
 </head>
+
+
 <body>
 
-<!-- ── 세로형 단면도 SVG 영역 ── -->
-<div class="map-container" id="mapContainer" aria-hidden="true">
-  <div class="map-inner">
-    <svg viewBox="0 0 440 900" preserveAspectRatio="none">
-      <!-- 1. 그리드 및 깊이 수치 -->
+
+<!-- ─────────────────────────────────
+     첫 화면의 넓은 단면도와
+     이후 좌측 단면도를
+     하나의 움직이는 틀 안에 배치
+───────────────────────────────── -->
+
+<div id="chartMorph" aria-hidden="true">
+
+
+  <!-- ── 첫 화면 가로형 조망도 ── -->
+
+  <div class="chart-pane hero-pane" id="hero">
+
+    <svg
+      viewBox="0 0 720 430"
+      preserveAspectRatio="xMidYMid meet"
+    >
+
       <g class="gridline">
-        <line x1="76" y1="218" x2="430" y2="218"/>
-        <line x1="76" y1="346" x2="430" y2="346"/>
-        <line x1="76" y1="474" x2="430" y2="474"/>
-        <line x1="76" y1="602" x2="430" y2="602"/>
-        <line x1="76" y1="730" x2="430" y2="730"/>
-        <line x1="76" y1="90"  x2="76"  y2="820"/>
+
+        <line
+          x1="60"
+          y1="120"
+          x2="712"
+          y2="120"
+        />
+
+        <line
+          x1="60"
+          y1="181"
+          x2="712"
+          y2="181"
+        />
+
+        <line
+          x1="60"
+          y1="241"
+          x2="712"
+          y2="241"
+        />
+
+        <line
+          x1="60"
+          y1="301"
+          x2="712"
+          y2="301"
+        />
+
+        <line
+          x1="60"
+          y1="362"
+          x2="712"
+          y2="362"
+        />
+
+        <line
+          x1="60"
+          y1="60"
+          x2="60"
+          y2="400"
+        />
+
       </g>
+
+
       <g class="num">
-        <text x="6" y="93">0</text>
-        <text x="6" y="221">- 2 0 0 0</text>
-        <text x="6" y="349">- 4 0 0 0</text>
-        <text x="6" y="477">- 6 0 0 0</text>
-        <text x="6" y="605">- 8 0 0 0</text>
-        <text x="2" y="733">- 1 0 0 0 0</text>
+
+        <text x="6" y="63">
+          0
+        </text>
+
+        <text x="6" y="123">
+          - 2 0 0 0
+        </text>
+
+        <text x="6" y="184">
+          - 4 0 0 0
+        </text>
+
+        <text x="6" y="244">
+          - 6 0 0 0
+        </text>
+
+        <text x="6" y="304">
+          - 8 0 0 0
+        </text>
+
+        <text x="2" y="365">
+          - 1 0 0 0 0
+        </text>
+
       </g>
 
-      <!-- 2. 수면 파도 -->
-      <path class="wave" d="M-20 90 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-      <path class="wave lit" id="litwave" d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-      <text class="lbl" x="330" y="76">해  수  면</text>
 
-      <!-- 3. 해저 지형 단면선 -->
-      <path class="floorline"
-        d="M76 314 C 92 250, 112 110, 128 54 L 146 82
-           C 164 140, 190 250, 216 372 C 244 500, 276 650, 302 762
-           L 312 790 L 322 758 C 346 660, 372 540, 400 492
-           C 414 470, 424 466, 434 470"/>
+      <!-- 화면 끝에서 끝까지 흐르는 수면 -->
 
-      <text class="lbl opt" x="150" y="40">마 리 아 나  열 도</text>
-      <text class="lbl opt" x="352" y="430">태  평  양  판</text>
-      <text class="lbl" x="196" y="822">챌 린 저  해 연</text>
+      <path
+        class="wave"
+        d="
+          M-20 60
+          q22 -5 44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+        "
+      />
 
-      <!-- 4. 항적 경로 및 정거장 -->
-      <path id="route" class="route"
-        d="M128 54 L 146 82 C 164 140, 190 250, 216 372
-           C 244 500, 276 650, 302 762 L 311 788"/>
+      <path
+        class="wave lit"
+        d="
+          M-20 63
+          q22 -6 44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+          t44 0
+        "
+      />
 
-      <g id="stations"></g>
+      <text
+        class="lbl"
+        x="612"
+        y="48"
+      >
+        해 　수 　면
+      </text>
 
-      <circle class="halo" id="glow" cx="128" cy="54" r="46" opacity=".26"/>
-      <circle cx="128" cy="54" r="6" fill="var(--dawn)" id="dyu"/>
-      <circle id="hae" cx="311" cy="788" r="7" fill="var(--current)" opacity="0"/>
 
-      <!-- 5. 실시간 동적 수치 및 포인터 -->
-      <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
-      <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
-      <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
-      <text class="read sm" id="readp" x="82" y="108">1 B A R</text>
-      <circle id="subw" cx="128" cy="54" r="5" fill="var(--dawn)"/>
-      <circle id="sub" cx="128" cy="54" r="4.2" fill="#EAF3F6" opacity="0"/>
+      <!-- 해저 단면 -->
+
+      <path
+        class="floorline"
+        d="
+          M60 104
+          L 96 66
+          L 128 30
+          L 162 70
+
+          C 198 112,
+            232 152,
+            268 198
+
+          C 296 232,
+            320 254,
+            352 266
+
+          C 392 282,
+            428 322,
+            462 386
+
+          L 470 396
+          L 480 376
+
+          C 512 320,
+            544 276,
+            588 256
+
+          C 636 236,
+            672 240,
+            712 238
+        "
+      />
+
+
+      <text
+        class="lbl opt"
+        x="92"
+        y="18"
+      >
+        마 리 아 나 　열 도
+      </text>
+
+      <text
+        class="lbl opt"
+        x="560"
+        y="228"
+      >
+        태 　평 　양 　판
+      </text>
+
+      <text
+        class="lbl"
+        x="392"
+        y="414"
+      >
+        챌 린 저 　해 연
+      </text>
+
+
+      <!-- 디유 -->
+
+      <circle
+        class="halo"
+        cx="128"
+        cy="30"
+        r="30"
+        opacity=".26"
+      />
+
+      <circle
+        cx="128"
+        cy="30"
+        r="4.6"
+        fill="var(--dawn)"
+      />
+
+
+      <!-- 해일 -->
+
+      <circle
+        cx="470"
+        cy="394"
+        r="4"
+        fill="var(--current)"
+        opacity=".4"
+      />
+
     </svg>
+
   </div>
+
+
+
+  <!-- ─────────────────────────────
+       첫 스크롤 뒤 나타나는
+       세로형 지도
+  ───────────────────────────── -->
+
+  <div
+    class="chart-pane compact-pane"
+    id="compact"
+  >
+
+
+    <!-- ── 배경 도면 ── -->
+
+    <div
+      class="compact-layer"
+      id="bg"
+    >
+
+      <svg
+        viewBox="0 0 440 900"
+        preserveAspectRatio="xMidYMid meet"
+      >
+
+        <g class="gridline">
+
+          <line
+            x1="76"
+            y1="218"
+            x2="430"
+            y2="218"
+          />
+
+          <line
+            x1="76"
+            y1="346"
+            x2="430"
+            y2="346"
+          />
+
+          <line
+            x1="76"
+            y1="474"
+            x2="430"
+            y2="474"
+          />
+
+          <line
+            x1="76"
+            y1="602"
+            x2="430"
+            y2="602"
+          />
+
+          <line
+            x1="76"
+            y1="730"
+            x2="430"
+            y2="730"
+          />
+
+          <line
+            x1="76"
+            y1="90"
+            x2="76"
+            y2="820"
+          />
+
+        </g>
+
+
+        <g class="num">
+
+          <text x="6" y="93">
+            0
+          </text>
+
+          <text x="6" y="221">
+            - 2 0 0 0
+          </text>
+
+          <text x="6" y="349">
+            - 4 0 0 0
+          </text>
+
+          <text x="6" y="477">
+            - 6 0 0 0
+          </text>
+
+          <text x="6" y="605">
+            - 8 0 0 0
+          </text>
+
+          <text x="2" y="733">
+            - 1 0 0 0 0
+          </text>
+
+        </g>
+
+
+        <!-- 찰랑이는 수면 -->
+
+        <path
+          class="wave"
+          d="
+            M-20 90
+            q22 -5 44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+          "
+        />
+
+        <path
+          class="wave lit"
+          id="litwave"
+          d="
+            M-20 93
+            q22 -6 44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+            t44 0
+          "
+        />
+
+
+        <text
+          class="lbl"
+          x="330"
+          y="76"
+        >
+          해 　수 　면
+        </text>
+
+
+        <!-- 해저 단면 -->
+
+        <path
+          class="floorline"
+          d="
+            M76 314
+
+            C 92 250,
+              112 110,
+              128 54
+
+            L 146 82
+
+            C 164 140,
+              190 250,
+              216 372
+
+            C 244 500,
+              276 650,
+              302 762
+
+            L 312 790
+            L 322 758
+
+            C 346 660,
+              372 540,
+              400 492
+
+            C 414 470,
+              424 466,
+              434 470
+          "
+        />
+
+
+        <text
+          class="lbl opt"
+          x="150"
+          y="40"
+        >
+          마 리 아 나 　열 도
+        </text>
+
+        <text
+          class="lbl opt"
+          x="352"
+          y="430"
+        >
+          태 　평 　양 　판
+        </text>
+
+        <text
+          class="lbl"
+          x="196"
+          y="822"
+        >
+          챌 린 저 　해 연
+        </text>
+
+      </svg>
+
+    </div>
+
+
+
+    <!-- ── 항적 · 정거장 · 두 사람 ── -->
+
+    <div
+      class="compact-layer"
+      id="track"
+    >
+
+      <svg
+        viewBox="0 0 440 900"
+        preserveAspectRatio="xMidYMid meet"
+      >
+
+        <path
+          id="route"
+          class="route"
+          d="
+            M128 54
+            L 146 82
+
+            C 164 140,
+              190 250,
+              216 372
+
+            C 244 500,
+              276 650,
+              302 762
+
+            L 311 788
+          "
+        />
+
+
+        <g id="stations"></g>
+
+
+        <circle
+          class="halo"
+          id="glow"
+          cx="128"
+          cy="54"
+          r="46"
+          opacity=".26"
+        />
+
+        <circle
+          cx="128"
+          cy="54"
+          r="6"
+          fill="var(--dawn)"
+          id="dyu"
+        />
+
+        <circle
+          id="hae"
+          cx="311"
+          cy="788"
+          r="7"
+          fill="var(--current)"
+          opacity="0"
+        />
+
+      </svg>
+
+    </div>
+
+
+
+    <!-- ── 계기 ── -->
+
+    <div
+      class="compact-layer"
+      id="inst"
+    >
+
+      <svg
+        viewBox="0 0 440 900"
+        preserveAspectRatio="xMidYMid meet"
+      >
+
+        <line
+          class="now"
+          id="now"
+          x1="76"
+          y1="90"
+          x2="430"
+          y2="90"
+        />
+
+        <path
+          class="caret"
+          id="caret"
+          d="M58 -6 L74 0 L58 6 Z"
+          transform="translate(0,90)"
+        />
+
+        <text
+          class="read"
+          id="read"
+          x="82"
+          y="78"
+        >
+          - 0 0 0 0 0 M
+        </text>
+
+        <text
+          class="read sm"
+          id="readp"
+          x="82"
+          y="108"
+        >
+          1 B A R
+        </text>
+
+        <circle
+          id="subw"
+          cx="128"
+          cy="54"
+          r="5"
+          fill="var(--dawn)"
+        />
+
+        <circle
+          id="sub"
+          cx="128"
+          cy="54"
+          r="4.2"
+          fill="#EAF3F6"
+          opacity="0"
+        />
+
+      </svg>
+
+    </div>
+
+
+  </div>
+
 </div>
 
+
+
+<!-- ─────────────────────────────────
+     심해에서 나타나는 연두빛
+───────────────────────────────── -->
+
 <div id="warm">
+
   <div class="warm-in">
+
     <div class="beam b1"></div>
     <div class="beam b2"></div>
     <div class="beam b3"></div>
+
   </div>
+
 </div>
+
+
+
+<!-- ─────────────────────────────────
+     본문
+───────────────────────────────── -->
 
 <div class="wrap">
 
-  <!-- ── 0. 메인 대문 커버 섹션 ── -->
-  <section class="stage" data-depth="0">
-  </section>
 
-  <!-- ✏️ 1. 첫 본문 (디유) -->
-  <section class="stage" data-depth="0">
+  <!-- ✏️ 해면 위 · 디유 -->
+
+  <section
+    class="stage"
+    data-depth="0"
+  >
+
     <div class="col">
+
       <p class="head">
-        <span class="id">닉네임</span>
+
+        <span class="id">
+          닉네임
+        </span>
+
         한바다 드림 계정<br>
         11°22′N 142°35′E · 마리아나 해구<br>
         haeil.love
+
       </p>
-      <p class="stamp">+ 0 5 7 0 M · 1 B A R</p>
-      <p class="zone">해  면 {위}</p>
-      <h2 style="color:var(--dawn)">디 유</h2>
-      <p class="spec">온새벽 · 풀 S급 가이드 · 빛과 대지</p>
-      <p class="body">가라앉는 것들을 아는 사람. 끌어올리지 않고 옆에 같이 앉아 있는 쪽을 택한다.</p>
-      <p class="go">정 거 장  네  곳  ·  아 래 로</p>
-    </div>
-  </section>
 
-  <!-- ✏️ 2. 정거장 1 -->
-  <section class="stage" data-depth="200">
-    <div class="col">
-      <p class="stamp">S T - 0 1  ·  - 0 0 2 0 0 M  ·  2 1 B A R</p>
-      <p class="zone">표  층</p>
-      <h2>인 포</h2>
-      <dl class="info">
-        <dt>닉네임</dt><dd>○○ / ○</dd>
-        <dt>나이대</dt><dd>20대</dd>
-        <dt>최애</dt><dd>해일(한바다)</dd>
-        <dt>주 관심사</dt><dd>센티넬·가이드, 드림, 자캐</dd>
-        <dt>트윗</dt><dd>덕질 7 : 잡담 3</dd>
-        <dt>답장</dt><dd>느려요, 그래도 다 읽어요</dd>
-      </dl>
-    </div>
-  </section>
 
-  <!-- ✏️ 3. 정거장 2 -->
-  <section class="stage" data-depth="1500">
-    <div class="col">
-      <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  ·  1 5 1 B A R</p>
-      <p class="zone">점 {해}  층</p>
-      <h2>규 정</h2>
-      <div class="rules ok">
-        <h3>이런 건 편해요</h3>
-        <ul>
-          <li>말 없이 팔로우, 언팔, 뮤트 다 괜찮아요</li>
-          <li>리트윗이나 인용 자유롭게 해주세요</li>
-          <li>같은 커플링이면 반가워요, 편하게 말 걸어주세요</li>
-        </ul>
-      </div>
-      <div class="rules no">
-        <h3>이런 건 조심해줘요</h3>
-        <ul>
-          <li>디유 설정이나 글을 무단으로 가져가는 것</li>
-          <li>다른 커플링 얘기를 멘션으로 보내는 것</li>
-          <li>제 계정을 다른 곳에 언급하며 옮기는 것</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+      <p class="stamp">
+        + 0 5 7 0 M · 1 B A R
+      </p>
 
-  <!-- ✏️ 4. 정거장 3 -->
-  <section class="stage" data-depth="6000">
-    <div class="col">
-      <p class="stamp">S T - 0 3  ·  - 0 6 0 0 0 M  ·  6 0 3 B A R</p>
-      <p class="zone">심  해  층</p>
-      <h2>링 크</h2>
-      <ul class="links">
-        <li><span class="label">트위터</span><a href="https://twitter.com/" target="_blank" rel="noopener">@아이디</a></li>
-        <li><span class="label">포스타입</span><a href="#" target="_blank" rel="noopener">글 모아둔 곳</a></li>
-        <li><span class="label">마시멜로</span><a href="#" target="_blank" rel="noopener">익명으로 말 걸기</a></li>
-      </ul>
-    </div>
-  </section>
 
-  <!-- ✏️ 5. 정거장 4 -->
-  <section class="stage" data-depth="10935">
-    <div class="col">
-      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  · 1 0 8 6 B A R  · 1 ~ 4 ℃</p>
-      <p class="zone">초  심 {해}  대</p>
-      <h2 style="color:var(--current)">해 일</h2>
-      <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
+      <p class="zone">
+        해 　면 　위
+      </p>
+
+
+      <h2 style="color:var(--dawn)">
+        디 유
+      </h2>
+
+
+      <p class="spec">
+        온새벽 · 풀 S급 가이드 · 빛과 대지
+      </p>
+
+
       <p class="body">
+        가라앉는 것들을 아는 사람. 끌어올리지 않고 옆에 같이 앉아 있는 쪽을 택한다.
+      </p>
+
+
+      <p class="go">
+        정 거 장 　네 　곳 　· 　아 래 로
+      </p>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ✏️ 정거장 1 -->
+
+  <section
+    class="stage"
+    data-depth="200"
+  >
+
+    <div class="col">
+
+      <p class="stamp">
+        S T - 0 1 　· 　- 0 0 2 0 0 M 　· 　2 1 B A R
+      </p>
+
+
+      <p class="zone">
+        표 　층
+      </p>
+
+
+      <h2>
+        인 포
+      </h2>
+
+
+      <dl class="info">
+
+        <dt>
+          닉네임
+        </dt>
+
+        <dd>
+          ○○ / ○
+        </dd>
+
+
+        <dt>
+          나이대
+        </dt>
+
+        <dd>
+          20대
+        </dd>
+
+
+        <dt>
+          최애
+        </dt>
+
+        <dd>
+          해일(한바다)
+        </dd>
+
+
+        <dt>
+          주 관심사
+        </dt>
+
+        <dd>
+          센티넬·가이드, 드림, 자캐
+        </dd>
+
+
+        <dt>
+          트윗
+        </dt>
+
+        <dd>
+          덕질 7 : 잡담 3
+        </dd>
+
+
+        <dt>
+          답장
+        </dt>
+
+        <dd>
+          느려요, 그래도 다 읽어요
+        </dd>
+
+      </dl>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ✏️ 정거장 2 -->
+
+  <section
+    class="stage"
+    data-depth="1500"
+  >
+
+    <div class="col">
+
+      <p class="stamp">
+        S T - 0 2 　· 　- 0 1 5 0 0 M 　· 　1 5 1 B A R
+      </p>
+
+
+      <p class="zone">
+        점 　심 　해 　층
+      </p>
+
+
+      <h2>
+        규 정
+      </h2>
+
+
+      <div class="rules ok">
+
+        <h3>
+          이런 건 편해요
+        </h3>
+
+        <ul>
+
+          <li>
+            말 없이 팔로우, 언팔, 뮤트 다 괜찮아요
+          </li>
+
+          <li>
+            리트윗이나 인용 자유롭게 해주세요
+          </li>
+
+          <li>
+            같은 커플링이면 반가워요, 편하게 말 걸어주세요
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="rules no">
+
+        <h3>
+          이런 건 조심해줘요
+        </h3>
+
+        <ul>
+
+          <li>
+            디유 설정이나 글을 무단으로 가져가는 것
+          </li>
+
+          <li>
+            다른 커플링 얘기를 멘션으로 보내는 것
+          </li>
+
+          <li>
+            제 계정을 다른 곳에 언급하며 옮기는 것
+          </li>
+
+        </ul>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ✏️ 정거장 3 -->
+
+  <section
+    class="stage"
+    data-depth="6000"
+  >
+
+    <div class="col">
+
+      <p class="stamp">
+        S T - 0 3 　· 　- 0 6 0 0 0 M 　· 　6 0 3 B A R
+      </p>
+
+
+      <p class="zone">
+        심 　해 　층
+      </p>
+
+
+      <h2>
+        링 크
+      </h2>
+
+
+      <ul class="links">
+
+        <li>
+
+          <span class="label">
+            트위터
+          </span>
+
+          <a
+            href="https://twitter.com/"
+            target="_blank"
+            rel="noopener"
+          >
+            @아이디
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <span class="label">
+            포스타입
+          </span>
+
+          <a
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            글 모아둔 곳
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <span class="label">
+            마시멜로
+          </span>
+
+          <a
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            익명으로 말 걸기
+          </a>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ✏️ 정거장 4 -->
+
+  <section
+    class="stage"
+    data-depth="10935"
+  >
+
+    <div class="col">
+
+      <p class="stamp">
+        S T - 0 4 　· 　- 1 0 9 3 5 M 　· 　1 0 8 6 B A R 　· 　1 ~ 4 ℃
+      </p>
+
+
+      <p class="zone">
+        초 　심 　해 　대
+      </p>
+
+
+      <h2 style="color:var(--current)">
+        해 일
+      </h2>
+
+
+      <p class="spec">
+        한바다 · SS급 센티넬 · 물의 군주
+      </p>
+
+
+      <p class="body">
+
         감각이 닿는 범위를 재보라는 말을 들으면 웃는다. 재본 적이 없어서가 아니라,
         재려고 들면 늘 물이 먼저 끝났기 때문에.
+
       </p>
-      <p class="body" style="margin-top:22px">
+
+
+      <p
+        class="body"
+        style="margin-top:22px"
+      >
+
         한바다는 자기 감각이 어디까지 뻗어 있는지 세어본 적이 없다. 셀 필요가 없었으니까.
         온새벽이 손을 얹은 날에야 처음으로, 물이 여기서 끝난다는 걸 알았다.
+
       </p>
+
+
       <div class="tags">
-        <span>심해 × 새벽</span><span>각인</span><span>쌍방구원</span><span>느린 연애</span>
+
+        <span>
+          심해 × 새벽
+        </span>
+
+        <span>
+          각인
+        </span>
+
+        <span>
+          쌍방구원
+        </span>
+
+        <span>
+          느린 연애
+        </span>
+
       </div>
-      <p class="floorsig">해 저  도  달  · {haeil.love}</p>
+
+
+      <p class="floorsig">
+        해 저 　도 　달 　· 　haeil.love
+      </p>
+
     </div>
+
   </section>
+
 
 </div>
 
+
+
 <script>
 (function(){
+
   var MAX=10935,
+
+      root=document.documentElement,
+
+      chartMorph=document.getElementById('chartMorph'),
+
       rd=document.getElementById('read'),
       rp=document.getElementById('readp'),
+
       caret=document.getElementById('caret'),
+
       warm=document.getElementById('warm'),
+
       route=document.getElementById('route'),
+
       sub=document.getElementById('sub'),
       subw=document.getElementById('subw'),
+
       litwave=document.getElementById('litwave'),
+
       now=document.getElementById('now'),
+
       glow=document.getElementById('glow'),
+
       dyu=document.getElementById('dyu'),
       hae=document.getElementById('hae'),
+
       stnBox=document.getElementById('stations'),
-      mapContainer=document.getElementById('mapContainer'),
-      stages=[].slice.call(document.querySelectorAll('.stage')),
-      depths=stages.map(function(s){return +s.dataset.depth}),
+
+      stages=[].slice.call(
+        document.querySelectorAll('.stage')
+      ),
+
+      depths=stages.map(function(s){
+        return +s.dataset.depth;
+      }),
+
       LEN=route.getTotalLength(),
+
       NS='http://www.w3.org/2000/svg',
-      marks=[],tick=false;
+
+      marks=[],
+
+      tick=false;
+
+
 
   route.style.strokeDasharray=LEN;
   route.style.strokeDashoffset=LEN;
 
-  function pad(n){var s=String(n);while(s.length<5)s='0'+s;return s.split('').join(' ')}
-  function clamp(v){return v<0?0:v>1?1:v}
-  function yOf(dep){return 90+(dep/MAX)*700}
 
-  /* 🎨 동적 수심 그라데이션 레벨 */
-  var COLOR_STAGES = [
-    { dep: 0,     bg: [235, 244, 248], ink: [28, 45, 55],   faint: [82, 107, 122], current: [43, 122, 139] },
-    { dep: 2000,  bg: [22, 48, 66],    ink: [210, 226, 235], faint: [110, 140, 158], current: [92, 176, 190] },
-    { dep: 10935, bg: [7, 16, 24],     ink: [185, 201, 212], faint: [94, 115, 129],  current: [92, 176, 190] }
+
+  function pad(n){
+
+    var s=String(n);
+
+    while(s.length<5){
+      s='0'+s;
+    }
+
+    return s.split('').join(' ');
+  }
+
+
+
+  function clamp(v){
+
+    return v<0
+      ? 0
+      : v>1
+        ? 1
+        : v;
+  }
+
+
+
+  function yOf(dep){
+
+    return 90+(dep/MAX)*700;
+  }
+
+
+
+  function mix(a,b,t){
+
+    return a+(b-a)*t;
+  }
+
+
+
+  function smooth(t){
+
+    t=clamp(t);
+
+    return t*t*(3-2*t);
+  }
+
+
+
+  function range(v,a,b){
+
+    return clamp(
+      (v-a)/(b-a)
+    );
+  }
+
+
+
+  /* ─────────────────────────────
+     첫 번째 화면 → ST-01
+
+     이 한 구간에서만
+     진행률이 0 → 1이 됨.
+
+     ST-01 이후에는 항상 1.
+  ───────────────────────────── */
+
+  function introProgress(){
+
+    if(stages.length<2){
+      return 1;
+    }
+
+
+    var a=stages[0].offsetTop,
+
+        b=stages[1].offsetTop,
+
+        span=Math.max(
+          1,
+          b-a
+        );
+
+
+    return clamp(
+      (window.scrollY-a)/span
+    );
+  }
+
+
+
+  /* ─────────────────────────────
+     중앙의 넓은 단면도 틀을
+
+     첫 스크롤 동안
+
+     중앙
+       ↓
+     왼쪽
+
+     넓은 가로형
+       ↓
+     좁은 세로형
+
+     으로 변경
+  ───────────────────────────── */
+
+  function placeChart(p){
+
+    var vw=window.innerWidth,
+
+        vh=window.innerHeight,
+
+        mobile=vw<900,
+
+
+        /* 첫 화면 그래프 크기
+
+           가로 화면에서는
+           최대 720px 정도.
+
+           화면 높이가 낮으면
+           자동으로 조금 줄어듦.
+        */
+
+        heroW=Math.min(
+          vw*(mobile?0.90:0.74),
+          720,
+          vh*(mobile?0.42:0.46)*(720/430)
+        ),
+
+
+        heroH=
+          heroW*(430/720),
+
+
+        /* 처음에는 가로 중앙 */
+
+        heroLeft=
+          (vw-heroW)/2,
+
+
+        /* 텍스트 아래쪽에
+           적당한 간격으로 배치 */
+
+        heroTop=Math.max(
+          mobile?230:290,
+          vh*(mobile?0.68:0.70)
+          -heroH/2
+        ),
+
+
+        /* 최종 위치는
+           기존 좌측 지도 폭과 동일 */
+
+        targetW=
+          mobile
+            ? vw
+            : Math.min(
+                vw*0.40,
+                440
+              ),
+
+
+        targetH=vh,
+
+        targetLeft=0,
+
+        targetTop=0,
+
+
+        /* 부드러운 가속/감속 */
+
+        e=smooth(p);
+
+
+
+    /* 위치 */
+
+    chartMorph.style.left=
+      mix(
+        heroLeft,
+        targetLeft,
+        e
+      )+'px';
+
+
+    chartMorph.style.top=
+      mix(
+        heroTop,
+        targetTop,
+        e
+      )+'px';
+
+
+
+    /* 크기 */
+
+    chartMorph.style.width=
+      mix(
+        heroW,
+        targetW,
+        e
+      )+'px';
+
+
+    chartMorph.style.height=
+      mix(
+        heroH,
+        targetH,
+        e
+      )+'px';
+
+
+
+    /* ───────────────────────────
+       가로형 → 세로형
+
+       단순히 한 SVG를 찌그러뜨리면
+       그래프가 보기 안 좋아지므로,
+
+       움직이는 틀 자체는 하나로 유지하고
+
+       첫 화면의 가로형 단면도와
+       좌측의 세로형 단면도를
+
+       중후반에 자연스럽게 교차시킴.
+    ─────────────────────────── */
+
+
+    root.style.setProperty(
+      '--herofade',
+
+      (
+        1-
+        smooth(
+          range(
+            p,
+            .48,
+            .92
+          )
+        )
+      ).toFixed(3)
+    );
+
+
+    root.style.setProperty(
+      '--compactfade',
+
+      smooth(
+        range(
+          p,
+          .38,
+          .84
+        )
+      ).toFixed(3)
+    );
+
+  }
+
+
+
+  /* ─────────────────────────────
+     수심에 따른 물빛
+
+     수면의 푸른빛
+       ↓
+     심해의 검정
+  ───────────────────────────── */
+
+  var TINT=[
+
+    [
+      0,
+      [18,50,68]
+    ],
+
+    [
+      2000,
+      [10,29,42]
+    ],
+
+    [
+      10935,
+      [3,7,12]
+    ]
+
   ];
 
-  var root = document.documentElement;
 
-  function interpolateColor(dep) {
-    var i = 0;
-    while (i < COLOR_STAGES.length - 2 && dep > COLOR_STAGES[i + 1].dep) i++;
-    var a = COLOR_STAGES[i], b = COLOR_STAGES[i + 1];
-    var t = clamp((dep - a.dep) / (b.dep - a.dep));
 
-    var bg = a.bg.map(function(v, k){ return Math.round(v + (b.bg[k] - v) * t); });
-    var ink = a.ink.map(function(v, k){ return Math.round(v + (b.ink[k] - v) * t); });
-    var faint = a.faint.map(function(v, k){ return Math.round(v + (b.faint[k] - v) * t); });
-    var current = a.current.map(function(v, k){ return Math.round(v + (b.current[k] - v) * t); });
+  function seaAt(dep){
 
-    root.style.setProperty('--sea', 'rgb(' + bg.join(',') + ')');
-    root.style.setProperty('--ink', 'rgb(' + ink.join(',') + ')');
-    root.style.setProperty('--faint', 'rgb(' + faint.join(',') + ')');
-    root.style.setProperty('--current', 'rgb(' + current.join(',') + ')');
-    root.style.setProperty('--hair', 'rgba(' + ink.join(',') + ', 0.25)');
-    root.style.setProperty('--grid', 'rgba(' + ink.join(',') + ', 0.12)');
+    var i=0;
+
+
+    while(
+      i<TINT.length-2 &&
+      dep>TINT[i+1][0]
+    ){
+      i++;
+    }
+
+
+    var a=TINT[i],
+
+        b=TINT[i+1],
+
+        t=clamp(
+          (dep-a[0])
+          /
+          (b[0]-a[0])
+        ),
+
+
+        c=[0,1,2].map(
+          function(k){
+
+            return Math.round(
+              a[1][k]
+              +
+              (
+                b[1][k]
+                -
+                a[1][k]
+              )
+              *
+              t
+            );
+
+          }
+        );
+
+
+    return 'rgb('
+      +c[0]+','
+      +c[1]+','
+      +c[2]+
+      ')';
   }
+
+
+
+  /* ── 현재 수심 위치를 항로 위에서 찾기 ── */
 
   function seek(targetY){
-    var lo=0,hi=LEN,mid=0,p;
-    for(var i=0;i<22;i++){
-      mid=(lo+hi)/2;p=route.getPointAtLength(mid);
-      if(p.y<targetY)lo=mid;else hi=mid;
-    }
-    return{len:mid,p:route.getPointAtLength(mid)};
-  }
 
-  stages.forEach(function(s, idx){
-    if(idx === 0) return;
-    var d = +s.dataset.depth;
-    if(d > 0) {
-      var sPoint = seek(yOf(d)),
-          c = document.createElementNS(NS,'circle'),
-          t = document.createElementNS(NS,'text');
-      c.setAttribute('cx',sPoint.p.x);c.setAttribute('cy',sPoint.p.y);
-      c.setAttribute('r',5.4);c.setAttribute('class','stn');
-      t.setAttribute('x',sPoint.p.x+11);t.setAttribute('y',sPoint.p.y+4);
-      t.setAttribute('class','stnum');
-      t.textContent='0'+(marks.length+1);
-      stnBox.appendChild(c);stnBox.appendChild(t);
-      marks.push({el:c,d:d});
-    }
-  });
+    var lo=0,
+        hi=LEN,
+        mid=0,
+        p;
 
-  function depthNow(){
-    var y=window.scrollY;
-    for(var i=stages.length-1;i>=0;i--){
-      var top=stages[i].offsetTop;
-      if(y>=top-2){
-        if(i===stages.length-1)return depths[i];
-        var span=stages[i+1].offsetTop-top;
-        var t=span>0?clamp((y-top)/span):0;
-        return depths[i]+(depths[i+1]-depths[i])*t;
+
+    for(
+      var i=0;
+      i<22;
+      i++
+    ){
+
+      mid=(lo+hi)/2;
+
+      p=
+        route.getPointAtLength(
+          mid
+        );
+
+
+      if(p.y<targetY){
+
+        lo=mid;
+
+      }else{
+
+        hi=mid;
+
       }
     }
+
+
+    return{
+      len:mid,
+
+      p:
+        route.getPointAtLength(
+          mid
+        )
+    };
+  }
+
+
+
+  /* ─────────────────────────────
+     각 stage를 기반으로
+     정거장 자동 생성
+  ───────────────────────────── */
+
+  depths.forEach(
+    function(d,i){
+
+      if(i===0){
+        return;
+      }
+
+
+      var s=
+            seek(
+              yOf(d)
+            ),
+
+          c=
+            document.createElementNS(
+              NS,
+              'circle'
+            ),
+
+          t=
+            document.createElementNS(
+              NS,
+              'text'
+            );
+
+
+      c.setAttribute(
+        'cx',
+        s.p.x
+      );
+
+      c.setAttribute(
+        'cy',
+        s.p.y
+      );
+
+      c.setAttribute(
+        'r',
+        5.4
+      );
+
+      c.setAttribute(
+        'class',
+        'stn'
+      );
+
+
+      t.setAttribute(
+        'x',
+        s.p.x+11
+      );
+
+      t.setAttribute(
+        'y',
+        s.p.y+4
+      );
+
+      t.setAttribute(
+        'class',
+        'stnum'
+      );
+
+
+      t.textContent=
+        '0'+i;
+
+
+      stnBox.appendChild(c);
+
+      stnBox.appendChild(t);
+
+
+      marks.push({
+        el:c,
+        d:d
+      });
+
+    }
+  );
+
+
+
+  /* ─────────────────────────────
+     현재 스크롤 위치를
+     실제 수심값으로 변환
+  ───────────────────────────── */
+
+  function depthNow(){
+
+    var y=
+      window.scrollY;
+
+
+    for(
+      var i=stages.length-1;
+      i>=0;
+      i--
+    ){
+
+      var top=
+        stages[i].offsetTop;
+
+
+      if(
+        y>=top-2
+      ){
+
+        if(
+          i===
+          stages.length-1
+        ){
+
+          return depths[i];
+        }
+
+
+        var span=
+              stages[i+1].offsetTop
+              -
+              top,
+
+
+            t=
+              span>0
+                ?
+                  clamp(
+                    (y-top)/span
+                  )
+                :
+                  0;
+
+
+        return (
+          depths[i]
+          +
+          (
+            depths[i+1]
+            -
+            depths[i]
+          )
+          *
+          t
+        );
+      }
+    }
+
+
     return depths[0];
   }
 
+
+
+  /* ─────────────────────────────
+     화면 업데이트
+  ───────────────────────────── */
+
   function upd(){
-    var scrollY = window.scrollY;
-    var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
 
-    /* 첫 스크롤 시작 시 가로폭 축소 및 좌측 이동 클래스 토글 */
-    if (scrollY > firstStageHeight * 0.1) {
-      mapContainer.classList.add('shrunk');
-    } else {
-      mapContainer.classList.remove('shrunk');
-    }
+    var dep=
+          depthNow(),
 
-    var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
+        r=
+          dep/MAX,
 
-    interpolateColor(dep);
+        y=
+          yOf(dep),
 
-    rd.textContent='- '+pad(Math.round(dep))+' M';
-    rd.setAttribute('y',y-12);
-    rp.textContent=String(Math.round(1+dep*0.0992)).split('').join(' ')+' B A R';
-    rp.setAttribute('y',y+20);
+        s=
+          seek(y);
 
-    now.setAttribute('y1',y);now.setAttribute('y2',y);
-    now.style.opacity=(clamp(dep/260)*0.5).toFixed(3);
-    caret.setAttribute('transform','translate(0,'+y+')');
 
-    route.style.strokeDashoffset=LEN-s.len;
-    sub.setAttribute('cx',s.p.x);sub.setAttribute('cy',s.p.y);
-    subw.setAttribute('cx',s.p.x);subw.setAttribute('cy',s.p.y);
 
-    var cool=clamp(dep/1400);
-    sub.setAttribute('opacity',cool.toFixed(3));
-    subw.setAttribute('opacity',(1-cool).toFixed(3));
+    /* ── 수심 ── */
 
-    var lit=clamp(1-dep/900);
-    litwave.setAttribute('opacity',(lit*0.5).toFixed(3));
+    rd.textContent=
+      '- '
+      +
+      pad(
+        Math.round(dep)
+      )
+      +
+      ' M';
 
-    var reach=clamp((dep-6600)/(MAX-6600));
-    warm.style.opacity=Math.pow(reach,1.7).toFixed(3);
 
-    glow.setAttribute('opacity',(0.26*(1-r*0.9)).toFixed(3));
-    dyu.setAttribute('opacity',(1-r*0.55).toFixed(3));
-    hae.setAttribute('opacity',clamp((r-0.72)/0.24).toFixed(3));
+    rd.setAttribute(
+      'y',
+      y-12
+    );
 
-    marks.forEach(function(m){m.el.classList.toggle('done',dep>=m.d-1)});
+
+
+    /* ── 압력 ── */
+
+    rp.textContent=
+      String(
+        Math.round(
+          1
+          +
+          dep*0.0992
+        )
+      )
+      .split('')
+      .join(' ')
+      +
+      ' B A R';
+
+
+    rp.setAttribute(
+      'y',
+      y+20
+    );
+
+
+
+    /* ── 현재 수심선 ── */
+
+    now.setAttribute(
+      'y1',
+      y
+    );
+
+    now.setAttribute(
+      'y2',
+      y
+    );
+
+
+    /* 수면에서는 커서선을 감춤 */
+
+    now.style.opacity=
+      (
+        clamp(
+          dep/260
+        )
+        *
+        .5
+      ).toFixed(3);
+
+
+
+    caret.setAttribute(
+      'transform',
+      'translate(0,'+y+')'
+    );
+
+
+
+    /* ───────────────────────────
+       첫 번째 스크롤에서만
+
+       중앙 그래프
+           ↓
+       좌측 그래프
+
+       로 이동
+    ─────────────────────────── */
+
+    var intro=
+          introProgress(),
+
+
+        chartIn=
+          smooth(
+            range(
+              intro,
+              .34,
+              .84
+            )
+          );
+
+
+    placeChart(
+      intro
+    );
+
+
+
+    /* ST-01에 가까워질수록
+       세로형 지도 내부 요소 등장 */
+
+    root.style.setProperty(
+      '--fgfade',
+      chartIn.toFixed(3)
+    );
+
+
+
+    /* 배경 수심색 */
+
+    root.style.setProperty(
+      '--sea',
+      seaAt(dep)
+    );
+
+
+
+    root.style.setProperty(
+      '--bgfade',
+
+      (
+        chartIn
+        *
+        (
+          1
+          -
+          r*0.45
+        )
+      ).toFixed(3)
+    );
+
+
+
+    /* ── 항적 ── */
+
+    route.style.strokeDashoffset=
+      LEN-s.len;
+
+
+
+    /* 잠수 위치 */
+
+    sub.setAttribute(
+      'cx',
+      s.p.x
+    );
+
+    sub.setAttribute(
+      'cy',
+      s.p.y
+    );
+
+
+    subw.setAttribute(
+      'cx',
+      s.p.x
+    );
+
+    subw.setAttribute(
+      'cy',
+      s.p.y
+    );
+
+
+
+    /* 표식은 수면에서 주황,
+       내려가면서 차갑게 식음 */
+
+    var cool=
+      clamp(
+        dep/1400
+      );
+
+
+    sub.setAttribute(
+      'opacity',
+      cool.toFixed(3)
+    );
+
+
+    subw.setAttribute(
+      'opacity',
+      (
+        1-cool
+      ).toFixed(3)
+    );
+
+
+
+    /* 수면의 금빛 물결은
+       약 900m에서 사라짐 */
+
+    var lit=
+      clamp(
+        1-dep/900
+      );
+
+
+    litwave.setAttribute(
+      'opacity',
+      (
+        lit*.34
+      ).toFixed(3)
+    );
+
+
+
+    /* ── 바닥 가까이에서 연두빛 ── */
+
+    var reach=
+      clamp(
+        (
+          dep-6600
+        )
+        /
+        (
+          MAX-6600
+        )
+      );
+
+
+    warm.style.opacity=
+      Math.pow(
+        reach,
+        1.7
+      )
+      .toFixed(3);
+
+
+
+    /* ── 디유 / 해일 ── */
+
+    glow.setAttribute(
+      'opacity',
+
+      (
+        .26
+        *
+        (
+          1-r*.9
+        )
+      ).toFixed(3)
+    );
+
+
+    dyu.setAttribute(
+      'opacity',
+
+      (
+        1-r*.55
+      ).toFixed(3)
+    );
+
+
+    hae.setAttribute(
+      'opacity',
+
+      clamp(
+        (
+          r-.72
+        )
+        /
+        .24
+      )
+      .toFixed(3)
+    );
+
+
+
+    /* 지나간 정거장 표시 */
+
+    marks.forEach(
+      function(m){
+
+        m.el.classList.toggle(
+          'done',
+          dep>=m.d-1
+        );
+
+      }
+    );
+
 
     tick=false;
   }
 
-  window.addEventListener('scroll',function(){
-    if(!tick){tick=true;requestAnimationFrame(upd)}
-  },{passive:true});
-  window.addEventListener('resize',upd);
+
+
+  /* ── 스크롤 ── */
+
+  window.addEventListener(
+    'scroll',
+
+    function(){
+
+      if(!tick){
+
+        tick=true;
+
+        requestAnimationFrame(
+          upd
+        );
+
+      }
+
+    },
+
+    {
+      passive:true
+    }
+  );
+
+
+
+  /* 창 크기가 바뀌면
+     첫 화면 그래프와
+     좌측 지도 위치를 재계산 */
+
+  window.addEventListener(
+    'resize',
+    upd
+  );
+
+
+
+  /* 첫 로드 */
+
   upd();
 
-  if('IntersectionObserver' in window){
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})
-    },{threshold:.25});
-    stages.forEach(function(s){io.observe(s)});
+
+
+  /* ── 본문 페이드인 ── */
+
+  if(
+    'IntersectionObserver'
+    in
+    window
+  ){
+
+    var io=
+      new IntersectionObserver(
+
+        function(es){
+
+          es.forEach(
+            function(e){
+
+              if(
+                e.isIntersecting
+              ){
+
+                e.target
+                  .classList
+                  .add('in');
+
+              }
+
+            }
+          );
+
+        },
+
+        {
+          threshold:.25
+        }
+
+      );
+
+
+    stages.forEach(
+      function(s){
+
+        io.observe(s);
+
+      }
+    );
+
+
   }else{
-    stages.forEach(function(s){s.classList.add('in')});
+
+
+    stages.forEach(
+      function(s){
+
+        s.classList.add(
+          'in'
+        );
+
+      }
+    );
+
   }
+
 })();
 </script>
+
+
 </body>
 </html>
