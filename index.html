@@ -907,16 +907,137 @@ a:hover{
 .story-log p:last-child{
   margin-bottom:0;
 }
+
+/* ─────────────────────────────
+   첫 접속 등장 효과 · 레이아웃 안전 버전
+   위치/크기는 건드리지 않고 opacity만 조절
+───────────────────────────── */
+
+body.intro-pending .axis,
+body.intro-pending .fixed-banner,
+body.intro-pending .top,
+body.intro-pending .hud{
+  opacity:0;
+}
+
+body.intro-ready .axis{
+  opacity:1;
+  transition:opacity 1.8s ease .10s;
+}
+
+body.intro-ready .fixed-banner{
+  opacity:1;
+  transition:opacity 2.2s ease .38s;
+}
+
+body.intro-ready .top{
+  opacity:1;
+  transition:opacity 2.25s ease .72s;
+}
+
+body.intro-ready .hud{
+  opacity:1;
+  transition:opacity 1.8s ease 1.05s;
+}
+
+
+/* ─────────────────────────────
+   심해 부유물
+   레이아웃과 완전히 분리된 fixed 장식 레이어
+───────────────────────────── */
+
+.deep-particles{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:6;
+  opacity:0;
+  transition:opacity 2.4s ease;
+}
+
+.deep-particle{
+  position:absolute;
+  display:block;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:rgba(225,244,250,.46);
+  box-shadow:0 0 6px rgba(194,231,242,.10);
+  opacity:var(--alpha,.24);
+  filter:blur(var(--blur,0px));
+  animation:
+    deepDrift
+    var(--duration,14s)
+    ease-in-out
+    var(--delay,0s)
+    infinite alternate;
+}
+
+.deep-particle.tiny{
+  width:1px;
+  height:1px;
+}
+
+.deep-particle.soft{
+  width:4px;
+  height:4px;
+  filter:blur(1px);
+}
+
+.deep-particle.fiber{
+  width:1px;
+  height:7px;
+  border-radius:99px;
+  background:rgba(218,238,244,.20);
+  filter:blur(.35px);
+}
+
+@keyframes deepDrift{
+  0%{
+    transform:translate3d(0,14px,0) rotate(0deg);
+  }
+  45%{
+    transform:translate3d(var(--drift-x,8px),-4px,0) rotate(4deg);
+  }
+  100%{
+    transform:translate3d(var(--drift-x2,-6px),-34px,0) rotate(-5deg);
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  body.intro-pending .axis,
+  body.intro-pending .fixed-banner,
+  body.intro-pending .top,
+  body.intro-pending .hud,
+  body.intro-ready .axis,
+  body.intro-ready .fixed-banner,
+  body.intro-ready .top,
+  body.intro-ready .hud{
+    opacity:1;
+    transition:none;
+  }
+
+  .deep-particle{
+    animation:none;
+  }
+}
   
 </style>
 </head>
 
 
-<body>
+<body class="intro-pending">
 
 
 <div id="dark"></div>
+<!-- 심해 부유물 -->
 
+<div
+  class="deep-particles"
+  id="deepParticles"
+  aria-hidden="true"
+></div>
 
 <!-- ─────────────────────────────
      현재 수심
@@ -1012,7 +1133,7 @@ a:hover{
 >
 
   <img
-    class="banner-slide"
+    class="banner-slide active"
     src="images/banner2.jpg"
     alt=""
     decoding="async"
@@ -1130,12 +1251,7 @@ a:hover{
     해 　구 　하 　부
   </p>
 
-<section
-  class="blk log-page"
-  data-depth="8400"
-  data-color-depth="9300"
->
-  <div class="story-log">
+<div class="story-log">
 
     <p>
       물속은 해일의 왕국이었다. 수면 위에서 부서지던 햇살이 물을 통과하며 길고 느린 금빛 기둥으로 변했다. 그 빛줄기가 온새벽의 금발 위에 떨어졌을 때, 해일은 눈을 떴다. 온새벽의 눈은 아직 감겨 있었다.
@@ -2434,6 +2550,137 @@ a:hover{
 })();
 </script>
 
+<script>
+(function(){
+
+  /* ─────────────────────────────
+     첫 접속 페이드인
+     opacity만 사용하므로 위치/스크롤 계산에 영향 없음
+  ───────────────────────────── */
+
+  function revealSite(){
+    var body=document.body;
+
+    window.requestAnimationFrame(function(){
+      window.requestAnimationFrame(function(){
+        body.classList.add('intro-ready');
+
+        window.setTimeout(function(){
+          body.classList.remove('intro-pending');
+          body.classList.remove('intro-ready');
+        },3600);
+      });
+    });
+  }
+
+  if(window.matchMedia &&
+     window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.body.classList.remove('intro-pending');
+  }else if(document.readyState==='complete'){
+    revealSite();
+  }else{
+    window.addEventListener('load',revealSite,{once:true});
+  }
+
+
+  /* ─────────────────────────────
+     심해 부유물 생성
+  ───────────────────────────── */
+
+  var container=document.getElementById('deepParticles');
+  if(!container)return;
+
+  var PARTICLE_COUNT=44;
+
+  for(var i=0;i<PARTICLE_COUNT;i++){
+    var particle=document.createElement('span');
+    particle.className='deep-particle';
+
+    var type=Math.random();
+    if(type<.38){
+      particle.classList.add('tiny');
+    }else if(type>.86){
+      particle.classList.add('soft');
+    }else if(type>.72){
+      particle.classList.add('fiber');
+    }
+
+    particle.style.left=(Math.random()*100)+'%';
+    particle.style.top=(Math.random()*100)+'%';
+
+    particle.style.setProperty(
+      '--duration',
+      (11+Math.random()*17)+'s'
+    );
+
+    particle.style.setProperty(
+      '--delay',
+      (-Math.random()*20)+'s'
+    );
+
+    particle.style.setProperty(
+      '--drift-x',
+      ((Math.random()*18)-9)+'px'
+    );
+
+    particle.style.setProperty(
+      '--drift-x2',
+      ((Math.random()*22)-11)+'px'
+    );
+
+    particle.style.setProperty(
+      '--alpha',
+      (.12+Math.random()*.25).toFixed(2)
+    );
+
+    container.appendChild(particle);
+  }
+
+
+  /* ─────────────────────────────
+     깊이에 따라 부유물 강도 조절
+     0m에서는 거의 보이지 않고 심해에서 서서히 증가
+  ───────────────────────────── */
+
+  var particleTick=false;
+
+  function updateParticles(){
+    var maxScroll=
+      document.documentElement.scrollHeight-window.innerHeight;
+
+    if(maxScroll<=0){
+      container.style.opacity='0';
+      particleTick=false;
+      return;
+    }
+
+    var progress=Math.max(
+      0,
+      Math.min(1,window.scrollY/maxScroll)
+    );
+
+    var depthFade=Math.max(
+      0,
+      Math.min(1,(progress-.28)/.72)
+    );
+
+    /* 심해에서도 과하게 반짝이지 않게 최대 0.52 */
+    container.style.opacity=(depthFade*.52).toFixed(3);
+    particleTick=false;
+  }
+
+  window.addEventListener('scroll',function(){
+    if(!particleTick){
+      particleTick=true;
+      window.requestAnimationFrame(updateParticles);
+    }
+  },{passive:true});
+
+  window.addEventListener('resize',updateParticles);
+  updateParticles();
+
+})();
+</script>
 
 </body>
 </html>
