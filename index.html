@@ -845,54 +845,64 @@ a:hover{
 
 }
 
+.log-page{
+  padding-top:
+    calc(14vh + 170px + 28px);
+
+  padding-bottom:6vh;
+}
+
+.log-page .zone{
+  margin-bottom:14px;
+}
+
 .story-log{
   position:relative;
 
-  margin-top:4px;
+  margin-top:0;
 
   padding:
-    20px
-    22px;
+    14px
+    16px;
 
   border-left:
     1px solid var(--current);
 
   background:
-    rgba(255,255,255,.025);
+    rgba(255,255,255,.02);
 }
-
 
 .story-log::before{
   content:"LOG";
 
   display:block;
 
-  margin-bottom:16px;
+  margin-bottom:10px;
 
   font-family:
     "IBM Plex Mono",
     monospace;
 
-  font-size:.6rem;
+  font-size:.54rem;
 
-  letter-spacing:.34em;
+  letter-spacing:.28em;
 
   color:var(--current);
 }
 
-
 .story-log p{
-  font-size:.82rem;
+  font-size:.74rem;
 
-  line-height:2.15;
+  line-height:1.9;
 
-  letter-spacing:.035em;
+  letter-spacing:.01em;
 
-  margin-bottom:15px;
+  margin-bottom:10px;
 
   color:var(--ink);
-}
 
+  word-break:keep-all;
+}
 
 .story-log p:last-child{
   margin-bottom:0;
@@ -1106,7 +1116,7 @@ a:hover{
 <!-- -8400m -->
 
 <section
-  class="blk"
+  class="blk log-page"
   data-depth="8400"
   data-color-depth="9300"
 >
@@ -1120,7 +1130,11 @@ a:hover{
     해 　구 　하 　부
   </p>
 
-
+<section
+  class="blk log-page"
+  data-depth="8400"
+  data-color-depth="9300"
+>
   <div class="story-log">
 
     <p>
