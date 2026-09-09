@@ -41,34 +41,35 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 단일 SVG 레이어 고정 및 축소 애니메이션 ── */
+/* ── 단일 SVG 레이어 고정 및 화면비 원본 유지 ── */
 .map-container{
   position:fixed;
   top:0;
   bottom:0;
   left:0;
-  width:100vw; /* 첫 화면에서는 100% 꽉 참 */
+  width:100vw;
+  height:100vh;
   display:flex;
   align-items:center;
-  justify-content:flex-start;
+  justify-content:center; /* 메인 화면에서는 중앙 정렬 */
   pointer-events:none;
   overflow:hidden;
   z-index: 0;
-  /* 스크롤 시 세로는 유지하고 가로 폭만 한 번에 좁아지는 transition (0.8초) */
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), justify-content 0.8s ease;
   will-change: width;
 }
 
-/* 본문에 도달했을 때 가로 폭이 한 번에 좁아지는 클래스 */
+/* 스크롤을 내리면 좌측 440px 영역으로 축소 및 왼쪽 정렬 */
 .map-container.shrunk{
   width: var(--mapw);
+  justify-content: flex-start;
 }
 
-/* 하나의 SVG 단면도가 전체를 지배하므로 어긋남이 완벽히 방지됨 */
 .map-container svg{
-  width:100%;
-  height:100%;
-  max-height:88vh;
+  width: auto;
+  height: 90vh;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
@@ -189,9 +190,9 @@ a:hover{border-color:var(--current)}
 </head>
 <body>
 
-<!-- ── 단일 통합 SVG 레이어 (배경, 그래프, 경로, 계기가 완벽히 하나로 묶임) ── -->
+<!-- ── 단일 SVG (비율 파손 방지 meet 옵션 적용) ── -->
 <div class="map-container" id="mapContainer" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
     <!-- 1. 그리드 및 깊이 수치 -->
     <g class="gridline">
       <line x1="76" y1="218" x2="430" y2="218"/>
@@ -444,7 +445,7 @@ a:hover{border-color:var(--current)}
     var scrollY = window.scrollY;
     var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
 
-    /* 첫 번째 화면을 지나 스크롤 내려가면 고정 레이어를 440px로 한 번에 좁힘 */
+    /* 첫 화면에서는 중앙에 온전한 크기로 보이다가 스크롤하면 좌측 440px 영역으로 이동 */
     if (scrollY > firstStageHeight * 0.1) {
       mapContainer.classList.add('shrunk');
     } else {
