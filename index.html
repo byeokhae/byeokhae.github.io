@@ -7,7 +7,7 @@
 <meta name="description" content="HAEIL ARCHIVE ACCOUNT">
 <meta property="og:title" content="베네치아의 새벽">
 <meta property="og:description" content="11°22′N 142°35′E · 한바다 × 온새벽">
-<meta name="theme-color" content="#0E1B26">
+<meta name="theme-color" content="#D9F0FF">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,7 +38,16 @@
 
 html{
   scroll-behavior:smooth;
-  scroll-snap-type:y mandatory;
+}
+
+/* 화면 세로가 충분할 때만 정거장 스냅.
+   낮은 화면에서는 긴 섹션의 아랫부분이 잘리므로 일반 스크롤로 둔다 */
+@media (min-height:700px){
+
+  html{
+    scroll-snap-type:y mandatory;
+  }
+
 }
 
 body{
@@ -94,24 +103,6 @@ body{
 .mono{
   font-family:"IBM Plex Mono",monospace;
   font-weight:300;
-}
-
-
-/* ─────────────────────────────
-   심해 배경 레이어
-───────────────────────────── */
-
-#dark{
-  position:fixed;
-  inset:0;
-
-  background:#07131F;
-
-  opacity:0;
-
-  z-index:-1;
-
-  pointer-events:none;
 }
 
 
@@ -454,7 +445,7 @@ body{
   line-height:2.1;
 }
 
-  .top-info{
+.top-info{
   margin-top:34px;
 }
 
@@ -750,6 +741,311 @@ a:hover{
 
 
 /* ─────────────────────────────
+   서사 로그
+───────────────────────────── */
+
+.log-page{
+  padding-top:
+    calc(14vh + 170px + 28px);
+
+  padding-bottom:6vh;
+}
+
+.log-page .zone{
+  margin-bottom:14px;
+}
+
+.story-log{
+  position:relative;
+
+  margin-top:0;
+
+  padding:
+    14px
+    16px;
+
+  border-left:
+    1px solid var(--current);
+
+  background:
+    rgba(255,255,255,.02);
+}
+
+.story-log::before{
+  content:"LOG";
+
+  display:block;
+
+  margin-bottom:10px;
+
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  font-size:.54rem;
+
+  letter-spacing:.28em;
+
+  color:var(--current);
+}
+
+.story-log p{
+  font-size:.74rem;
+
+  line-height:1.9;
+
+  letter-spacing:.01em;
+
+  margin-bottom:10px;
+
+  color:var(--ink);
+
+  word-break:keep-all;
+}
+
+.story-log p:last-child{
+  margin-bottom:0;
+}
+
+
+/* ─────────────────────────────
+   OTHER ACCOUNT
+───────────────────────────── */
+
+.account-page{
+  justify-content:flex-end;
+}
+
+.account-panel{
+  width:100%;
+
+  margin-bottom:7vh;
+}
+
+.account-panel .stamp{
+  margin-bottom:6px;
+}
+
+.account-panel .zone{
+  margin-bottom:28px;
+}
+
+.account-links{
+  margin-top:0;
+
+  border-top:
+    1px solid var(--hair);
+}
+
+.account-links a{
+  display:grid;
+
+  grid-template-columns:
+    6.5rem
+    1fr
+    auto;
+
+  align-items:center;
+
+  gap:18px;
+
+  padding:
+    17px
+    4px;
+
+  border-bottom:
+    1px solid var(--hair);
+
+  color:var(--ink);
+
+  text-decoration:none;
+
+  transition:
+    padding-left .35s ease,
+    color .35s ease,
+    background .35s ease;
+}
+
+.account-links a:hover{
+  padding-left:10px;
+
+  color:var(--current);
+
+  background:
+    rgba(255,255,255,.018);
+}
+
+.account-name{
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  font-size:.68rem;
+
+  letter-spacing:.22em;
+
+  color:var(--current);
+}
+
+.account-address{
+  font-size:.76rem;
+
+  letter-spacing:.08em;
+
+  color:var(--faint);
+}
+
+.account-arrow{
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  font-size:.72rem;
+
+  color:var(--faint);
+
+  transition:
+    transform .35s ease,
+    color .35s ease;
+}
+
+.account-links a:hover .account-arrow{
+  transform:
+    translate(
+      3px,
+      -3px
+    );
+
+  color:var(--current);
+}
+
+.account-panel .floor{
+  margin-top:28px;
+
+  padding-top:22px;
+
+  margin-bottom:0;
+}
+
+
+/* ─────────────────────────────
+   첫 접속 등장 효과
+   opacity만 조절하므로 위치/크기에 영향 없음
+───────────────────────────── */
+
+body.intro-pending .axis,
+body.intro-pending .fixed-banner,
+body.intro-pending .top,
+body.intro-pending .hud{
+  opacity:0;
+}
+
+body.intro-ready .axis{
+  opacity:1;
+  transition:opacity 1.8s ease .10s;
+}
+
+body.intro-ready .fixed-banner{
+  opacity:1;
+  transition:opacity 2.2s ease .38s;
+}
+
+body.intro-ready .top{
+  opacity:1;
+  transition:opacity 2.25s ease .72s;
+}
+
+body.intro-ready .hud{
+  opacity:1;
+  transition:opacity 1.8s ease 1.05s;
+}
+
+
+/* ─────────────────────────────
+   심해 부유물
+───────────────────────────── */
+
+.deep-particles{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:6;
+  opacity:0;
+  transition:opacity 2.4s ease;
+}
+
+.deep-particle{
+  position:absolute;
+  display:block;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:rgba(225,244,250,.46);
+  box-shadow:0 0 6px rgba(194,231,242,.10);
+  opacity:var(--alpha,.24);
+  filter:blur(var(--blur,0px));
+  animation:
+    deepDrift
+    var(--duration,14s)
+    ease-in-out
+    var(--delay,0s)
+    infinite alternate;
+}
+
+.deep-particle.tiny{
+  width:1px;
+  height:1px;
+}
+
+.deep-particle.soft{
+  width:4px;
+  height:4px;
+  filter:blur(1px);
+}
+
+.deep-particle.fiber{
+  width:1px;
+  height:7px;
+  border-radius:99px;
+  background:rgba(218,238,244,.20);
+  filter:blur(.35px);
+}
+
+@keyframes deepDrift{
+  0%{
+    transform:translate3d(0,14px,0) rotate(0deg);
+  }
+  45%{
+    transform:translate3d(var(--drift-x,8px),-4px,0) rotate(4deg);
+  }
+  100%{
+    transform:translate3d(var(--drift-x2,-6px),-34px,0) rotate(-5deg);
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+
+  body.intro-pending .axis,
+  body.intro-pending .fixed-banner,
+  body.intro-pending .top,
+  body.intro-pending .hud,
+  body.intro-ready .axis,
+  body.intro-ready .fixed-banner,
+  body.intro-ready .top,
+  body.intro-ready .hud{
+    opacity:1;
+    transition:none;
+  }
+
+  .deep-particle{
+    animation:none;
+  }
+
+}
+
+
+/* ─────────────────────────────
    PC
 ───────────────────────────── */
 
@@ -772,6 +1068,12 @@ a:hover{
 
   .axis{
     left:26px;
+  }
+
+  /* 축이 화면 왼쪽 끝으로 오므로 눈금 숫자를 축 오른쪽에 붙인다 */
+  .axis b{
+    right:auto;
+    left:12px;
   }
 
   .wrap{
@@ -843,417 +1145,6 @@ a:hover{
     padding-bottom:54px;
   }
 
-}
-
-.log-page{
-  padding-top:
-    calc(14vh + 170px + 28px);
-
-  padding-bottom:6vh;
-}
-
-.log-page .zone{
-  margin-bottom:14px;
-}
-
-.story-log{
-  position:relative;
-
-  margin-top:0;
-
-  padding:
-    14px
-    16px;
-
-  border-left:
-    1px solid var(--current);
-
-  background:
-    rgba(255,255,255,.02);
-}
-
-.story-log::before{
-  content:"LOG";
-
-  display:block;
-
-  margin-bottom:10px;
-
-  font-family:
-    "IBM Plex Mono",
-    monospace;
-
-  font-size:.54rem;
-
-  letter-spacing:.28em;
-
-  color:var(--current);
-}
-
-.story-log p{
-  font-size:.74rem;
-
-  line-height:1.9;
-
-  letter-spacing:.01em;
-
-  margin-bottom:10px;
-
-  color:var(--ink);
-
-  word-break:keep-all;
-}
-
-.story-log p:last-child{
-  margin-bottom:0;
-}
-
-/* ─────────────────────────────
-   첫 접속 등장 효과 · 레이아웃 안전 버전
-   위치/크기는 건드리지 않고 opacity만 조절
-───────────────────────────── */
-
-body.intro-pending .axis,
-body.intro-pending .fixed-banner,
-body.intro-pending .top,
-body.intro-pending .hud{
-  opacity:0;
-}
-
-body.intro-ready .axis{
-  opacity:1;
-  transition:opacity 1.8s ease .10s;
-}
-
-body.intro-ready .fixed-banner{
-  opacity:1;
-  transition:opacity 2.2s ease .38s;
-}
-
-body.intro-ready .top{
-  opacity:1;
-  transition:opacity 2.25s ease .72s;
-}
-
-body.intro-ready .hud{
-  opacity:1;
-  transition:opacity 1.8s ease 1.05s;
-}
-
-
-/* ─────────────────────────────
-   심해 부유물
-   레이아웃과 완전히 분리된 fixed 장식 레이어
-───────────────────────────── */
-
-.deep-particles{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  pointer-events:none;
-  z-index:6;
-  opacity:0;
-  transition:opacity 2.4s ease;
-}
-
-.deep-particle{
-  position:absolute;
-  display:block;
-  width:2px;
-  height:2px;
-  border-radius:50%;
-  background:rgba(225,244,250,.46);
-  box-shadow:0 0 6px rgba(194,231,242,.10);
-  opacity:var(--alpha,.24);
-  filter:blur(var(--blur,0px));
-  animation:
-    deepDrift
-    var(--duration,14s)
-    ease-in-out
-    var(--delay,0s)
-    infinite alternate;
-}
-
-.deep-particle.tiny{
-  width:1px;
-  height:1px;
-}
-
-.deep-particle.soft{
-  width:4px;
-  height:4px;
-  filter:blur(1px);
-}
-
-.deep-particle.fiber{
-  width:1px;
-  height:7px;
-  border-radius:99px;
-  background:rgba(218,238,244,.20);
-  filter:blur(.35px);
-}
-
-@keyframes deepDrift{
-  0%{
-    transform:translate3d(0,14px,0) rotate(0deg);
-  }
-  45%{
-    transform:translate3d(var(--drift-x,8px),-4px,0) rotate(4deg);
-  }
-  100%{
-    transform:translate3d(var(--drift-x2,-6px),-34px,0) rotate(-5deg);
-  }
-}
-
-@media (prefers-reduced-motion:reduce){
-  body.intro-pending .axis,
-  body.intro-pending .fixed-banner,
-  body.intro-pending .top,
-  body.intro-pending .hud,
-  body.intro-ready .axis,
-  body.intro-ready .fixed-banner,
-  body.intro-ready .top,
-  body.intro-ready .hud{
-    opacity:1;
-    transition:none;
-  }
-
-  .deep-particle{
-    animation:none;
-  }
-}
-
-/* ─────────────────────────────
-   OTHER ACCOUNT
-───────────────────────────── */
-
-.account-links{
-  margin-top:auto;
-
-  border-top:
-    1px solid var(--hair);
-}
-
-.account-links a{
-  display:grid;
-
-  grid-template-columns:
-    6.5rem
-    1fr
-    auto;
-
-  align-items:center;
-
-  gap:18px;
-
-  padding:
-    17px
-    4px;
-
-  border-bottom:
-    1px solid var(--hair);
-
-  color:var(--ink);
-
-  text-decoration:none;
-
-  transition:
-    padding-left .35s ease,
-    color .35s ease,
-    background .35s ease;
-}
-
-
-.account-links a:hover{
-  padding-left:10px;
-
-  color:var(--current);
-
-  background:
-    rgba(255,255,255,.018);
-}
-
-
-.account-name{
-  font-family:
-    "IBM Plex Mono",
-    monospace;
-
-  font-size:.68rem;
-
-  letter-spacing:.22em;
-
-  color:var(--current);
-}
-
-
-.account-address{
-  font-size:.76rem;
-
-  letter-spacing:.08em;
-
-  color:var(--faint);
-}
-
-
-.account-arrow{
-  font-family:
-    "IBM Plex Mono",
-    monospace;
-
-  font-size:.72rem;
-
-  color:var(--faint);
-
-  transition:
-    transform .35s ease,
-    color .35s ease;
-}
-
-
-.account-links a:hover
-.account-arrow{
-  transform:
-    translate(
-      3px,
-      -3px
-    );
-
-  color:var(--current);
-}
-
-/* ─────────────────────────────
-   -10000m OTHER ACCOUNT
-───────────────────────────── */
-
-.account-page{
-  justify-content:flex-end;
-}
-
-.account-panel{
-  width:100%;
-
-  margin-bottom:7vh;
-}
-
-.account-panel .stamp{
-  margin-bottom:6px;
-}
-
-.account-panel .zone{
-  margin-bottom:28px;
-}
-
-
-/* 링크 영역 */
-
-.account-panel .account-links{
-  margin-top:0;
-
-  border-top:
-    1px solid var(--hair);
-}
-
-
-.account-links a{
-  display:grid;
-
-  grid-template-columns:
-    6.5rem
-    1fr
-    auto;
-
-  align-items:center;
-
-  gap:18px;
-
-  padding:
-    17px
-    4px;
-
-  border-bottom:
-    1px solid var(--hair);
-
-  color:var(--ink);
-
-  text-decoration:none;
-
-  transition:
-    padding-left .35s ease,
-    color .35s ease,
-    background .35s ease;
-}
-
-
-.account-links a:hover{
-  padding-left:10px;
-
-  color:var(--current);
-
-  background:
-    rgba(255,255,255,.018);
-}
-
-
-.account-name{
-  font-family:
-    "IBM Plex Mono",
-    monospace;
-
-  font-size:.68rem;
-
-  letter-spacing:.22em;
-
-  color:var(--current);
-}
-
-
-.account-address{
-  font-size:.76rem;
-
-  letter-spacing:.08em;
-
-  color:var(--faint);
-}
-
-
-.account-arrow{
-  font-family:
-    "IBM Plex Mono",
-    monospace;
-
-  font-size:.72rem;
-
-  color:var(--faint);
-
-  transition:
-    transform .35s ease,
-    color .35s ease;
-}
-
-
-.account-links a:hover .account-arrow{
-  transform:
-    translate(
-      3px,
-      -3px
-    );
-
-  color:var(--current);
-}
-
-
-/* 하단 문구 */
-
-.account-panel .floor{
-  margin-top:28px;
-
-  padding-top:22px;
-
-  margin-bottom:0;
-}
-
-  @media (max-width:520px){
 
   .log-page{
     padding-top:
@@ -1268,9 +1159,6 @@ body.intro-ready .hud{
     padding-bottom:54px;
   }
 
-}
-
-  @media (max-width:520px){
 
   /* OCEAN EDGE */
   .top .id{
@@ -1316,13 +1204,12 @@ body.intro-ready .hud{
     margin-top:34px;
   }
 
-  /* 위/아래 정보 사이 간격도 살짝 축소 */
   .top-info{
     margin-top:27px;
   }
 
 }
-  
+
 </style>
 </head>
 
@@ -1330,7 +1217,6 @@ body.intro-ready .hud{
 <body class="intro-pending">
 
 
-<div id="dark"></div>
 <!-- 심해 부유물 -->
 
 <div
@@ -1338,6 +1224,7 @@ body.intro-ready .hud{
   id="deepParticles"
   aria-hidden="true"
 ></div>
+
 
 <!-- ─────────────────────────────
      현재 수심
@@ -1544,7 +1431,7 @@ body.intro-ready .hud{
     해 　구 　하 　부
   </p>
 
-<div class="story-log">
+  <div class="story-log">
 
     <p>
       물속은 해일의 왕국이었다. 수면 위에서 부서지던 햇살이 물을 통과하며 길고 느린 금빛 기둥으로 변했다. 그 빛줄기가 온새벽의 금발 위에 떨어졌을 때, 해일은 눈을 떴다. 온새벽의 눈은 아직 감겨 있었다.
@@ -1674,11 +1561,6 @@ body.intro-ready .hud{
       p=
         document.getElementById(
           'hud-p'
-        ),
-
-      dark=
-        document.getElementById(
-          'dark'
         ),
 
       mk=
@@ -1862,6 +1744,9 @@ body.intro-ready .hud{
 
   /* ─────────────────────────────
      수심별 색
+
+     current = 제목, 링크, 로그 왼쪽 선, 수심축 마커에 쓰이는 강조색.
+     밝은 수면에서는 진한 청록, 심해로 갈수록 밝은 청록.
   ───────────────────────────── */
 
   var DEPTH_PALETTE=[
@@ -1903,6 +1788,12 @@ body.intro-ready .hud{
         58,
         91,
         115
+      ],
+
+      current:[
+        23,
+        88,
+        102
       ]
 
     },
@@ -1944,6 +1835,12 @@ body.intro-ready .hud{
         151,
         184,
         204
+      ],
+
+      current:[
+        126,
+        206,
+        219
       ]
 
     },
@@ -1985,6 +1882,12 @@ body.intro-ready .hud{
         129,
         161,
         181
+      ],
+
+      current:[
+        108,
+        192,
+        206
       ]
 
     },
@@ -2026,6 +1929,12 @@ body.intro-ready .hud{
         150,
         180,
         196
+      ],
+
+      current:[
+        92,
+        176,
+        190
       ]
 
     }
@@ -2121,6 +2030,13 @@ body.intro-ready .hud{
         mixColor(
           a.hair,
           b.hair,
+          t
+        ),
+
+      current:
+        mixColor(
+          a.current,
+          b.current,
           t
         )
 
@@ -2461,6 +2377,14 @@ body.intro-ready .hud{
 
 
     root.style.setProperty(
+      '--current',
+      rgb(
+        pal.current
+      )
+    );
+
+
+    root.style.setProperty(
       '--hair',
 
       'rgba('
@@ -2475,9 +2399,6 @@ body.intro-ready .hud{
       +
       ',.30)'
     );
-
-
-    dark.style.opacity='0';
 
   }
 
@@ -2876,13 +2797,13 @@ body.intro-ready .hud{
 })();
 </script>
 
+
+<!-- ─────────────────────────────
+     첫 접속 페이드인 · 심해 부유물
+───────────────────────────── -->
+
 <script>
 (function(){
-
-  /* ─────────────────────────────
-     첫 접속 페이드인
-     opacity만 사용하므로 위치/스크롤 계산에 영향 없음
-  ───────────────────────────── */
 
   function revealSite(){
     var body=document.body;
@@ -2909,9 +2830,7 @@ body.intro-ready .hud{
   }
 
 
-  /* ─────────────────────────────
-     심해 부유물 생성
-  ───────────────────────────── */
+  /* 부유물 생성 */
 
   var container=document.getElementById('deepParticles');
   if(!container)return;
@@ -2963,10 +2882,7 @@ body.intro-ready .hud{
   }
 
 
-  /* ─────────────────────────────
-     깊이에 따라 부유물 강도 조절
-     0m에서는 거의 보이지 않고 심해에서 서서히 증가
-  ───────────────────────────── */
+  /* 깊이에 따라 부유물 강도 조절 */
 
   var particleTick=false;
 
@@ -2990,7 +2906,6 @@ body.intro-ready .hud{
       Math.min(1,(progress-.28)/.72)
     );
 
-    /* 심해에서도 과하게 반짝이지 않게 최대 0.52 */
     container.style.opacity=(depthFade*.52).toFixed(3);
     particleTick=false;
   }
@@ -3008,111 +2923,5 @@ body.intro-ready .hud{
 })();
 </script>
 
-<script>
-(function(){
-
-  const mobile =
-    window.matchMedia('(max-width:520px)');
-
-  const stations =
-    [...document.querySelectorAll('[data-depth]')];
-
-  let timer;
-  let snapping = false;
-
-
-  function snapToStation(){
-
-    if(!mobile.matches || snapping){
-      return;
-    }
-
-    const now =
-      window.scrollY;
-
-    let nearest =
-      stations[0];
-
-    let distance =
-      Infinity;
-
-
-    stations.forEach(function(section){
-
-      const gap =
-        Math.abs(
-          section.offsetTop - now
-        );
-
-      if(gap < distance){
-
-        distance = gap;
-        nearest = section;
-
-      }
-
-    });
-
-
-    if(distance < 3){
-      return;
-    }
-
-
-    snapping = true;
-
-
-    window.scrollTo({
-
-      top:
-        nearest.offsetTop,
-
-      behavior:
-        'smooth'
-
-    });
-
-
-    setTimeout(function(){
-
-      snapping = false;
-
-    }, 650);
-
-  }
-
-
-  window.addEventListener(
-    'scroll',
-
-    function(){
-
-      if(
-        !mobile.matches
-        ||
-        snapping
-      ){
-        return;
-      }
-
-      clearTimeout(timer);
-
-      timer =
-        setTimeout(
-          snapToStation,
-          160
-        );
-
-    },
-
-    {
-      passive:true
-    }
-
-  );
-
-})();
-</script>
-  
 </body>
 </html>
