@@ -14,7 +14,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%2338788A'/></svg>">
 
 <style>
-/* ✏️ 색상 및 레이아웃 변수 (수면 기준: 옅은 하늘색 배경 + 짙은 텍스트) */
+/* ✏️ 색상 및 레이아웃 변수 */
 :root{
   --sea: #EBF4F8;                  /* 시작: 옅은 하늘색 */
   --ink: #1C2D37;                  /* 시작: 짙은 흑청색 글자 */
@@ -46,7 +46,7 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 단일 SVG 레이어 고정 및 좌측 슬라이드 애니메이션 ── */
+/* ── 화면 고정 SVG 컨테이너 ── */
 .map-container{
   position: fixed;
   top: 0; bottom: 0; left: 0; right: 0;
@@ -58,20 +58,21 @@ a:hover{border-color:var(--current)}
   z-index: 0;
 }
 
-/* 중앙에서 좌측 영역으로 이동하는 부드러운 애니메이션 연출 */
+/* ✏️ 메인화면(넓음) -> 첫 스크롤 시 좁아지며 좌측 이동(애니메이션 적용) */
 .map-inner{
-  width: min(100vw, 440px);
-  height: 90vh;
+  width: min(85vw, 1000px);
+  height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
   transform: translateX(0);
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: width, transform;
 }
 
-/* 스크롤 다운 시 좌측 정렬 상태로 스무스하게 이동 */
+/* 첫 스크롤 발생 시 클래스가 붙으며 폭이 줄어들고 좌측으로 이동 */
 .map-container.shrunk .map-inner{
+  width: var(--mapw);
   transform: translateX(calc(-50vw + var(--mapw) / 2 + 20px));
 }
 
@@ -129,7 +130,7 @@ a:hover{border-color:var(--current)}
   @keyframes reach{0%,100%{opacity:.76}50%{opacity:1}}
 }
 
-/* ── 오른쪽 본문 ── */
+/* ── 본문 레이아웃 ── */
 .wrap{position:relative;z-index:1}
 .stage{min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;
        display:flex;flex-direction:column;justify-content:center;padding:64px 0}
@@ -179,29 +180,25 @@ a:hover{border-color:var(--current)}
           font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
           letter-spacing:.24em;color:var(--faint)}
 
-/* 데스크탑 및 큰 화면 전용 배치 */
+/* 데스크탑 여백 설정 (shrunk 상태와 일치) */
 @media (min-width:900px){
   body{padding-left:calc(var(--mapw) + 52px);padding-right:34px}
 }
-/* 모바일 반응형 처리 */
 @media (max-width:899px){
-  .map-container.shrunk .map-inner{transform:translateX(0)}
-  .map-inner{width:min(100vw,420px)}
-}
-@media (max-width:520px){
   body{padding:0 20px;font-size:13px}
   .stage{padding:56px 0}
   .info{grid-template-columns:5rem 1fr}
   .opt{display:none}
+  .map-container.shrunk .map-inner{transform:translateX(0)}
 }
 </style>
 </head>
 <body>
 
-<!-- ── 부드럽게 왼쪽으로 이동하는 SVG 래퍼 ── -->
+<!-- ── 메인 화면에서는 넓고, 첫 스크롤 시 폭이 줄어들며 좌측으로 이동하는 영역 ── -->
 <div class="map-container" id="mapContainer" aria-hidden="true">
   <div class="map-inner">
-    <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 440 900" preserveAspectRatio="none">
       <!-- 1. 그리드 및 깊이 수치 -->
       <g class="gridline">
         <line x1="76" y1="218" x2="430" y2="218"/>
@@ -268,7 +265,7 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ── 0. 첫 번째 메인 커버 섹션 ── -->
+  <!-- ── 0. 메인 대문 커버 섹션 ── -->
   <section class="stage" data-depth="0">
   </section>
 
@@ -350,7 +347,7 @@ a:hover{border-color:var(--current)}
   <section class="stage" data-depth="10935">
     <div class="col">
       <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  · 1 0 8 6 B A R  · 1 ~ 4 ℃</p>
-      <p class="zone">초  심  해  대</p>
+      <p class="zone">초  심 {해}  대</p>
       <h2 style="color:var(--current)">해 일</h2>
       <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
       <p class="body">
@@ -400,11 +397,11 @@ a:hover{border-color:var(--current)}
   function clamp(v){return v<0?0:v>1?1:v}
   function yOf(dep){return 90+(dep/MAX)*700}
 
-  /* 🎨 수심별 배경, 글자, 라인 색상 그라데이션 테이블 */
+  /* 🎨 동적 수심 그라데이션 레벨 */
   var COLOR_STAGES = [
-    { dep: 0,     bg: [235, 244, 248], ink: [28, 45, 55],   faint: [82, 107, 122], current: [43, 122, 139] },  /* 0m: 옅은 하늘색 배경, 짙은 텍스트 */
-    { dep: 2000,  bg: [22, 48, 66],    ink: [210, 226, 235], faint: [110, 140, 158], current: [92, 176, 190] },  /* 중간 수심: 파란색 진입 */
-    { dep: 10935, bg: [7, 16, 24],     ink: [185, 201, 212], faint: [94, 115, 129],  current: [92, 176, 190] }   /* 심해: 짙은 남색 배경, 밝은 텍스트 */
+    { dep: 0,     bg: [235, 244, 248], ink: [28, 45, 55],   faint: [82, 107, 122], current: [43, 122, 139] },
+    { dep: 2000,  bg: [22, 48, 66],    ink: [210, 226, 235], faint: [110, 140, 158], current: [92, 176, 190] },
+    { dep: 10935, bg: [7, 16, 24],     ink: [185, 201, 212], faint: [94, 115, 129],  current: [92, 176, 190] }
   ];
 
   var root = document.documentElement;
@@ -472,7 +469,7 @@ a:hover{border-color:var(--current)}
     var scrollY = window.scrollY;
     var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
 
-    /* 첫 스크롤 시 좌측으로 부드럽게 이동 트랜지션 클래스 토글 */
+    /* 첫 스크롤 시작 시 가로폭 축소 및 좌측 이동 클래스 토글 */
     if (scrollY > firstStageHeight * 0.1) {
       mapContainer.classList.add('shrunk');
     } else {
