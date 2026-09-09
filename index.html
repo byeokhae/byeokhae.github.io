@@ -8,156 +8,273 @@
 <meta property="og:title" content="해일 · info">
 <meta property="og:description" content="11°22′N 142°35′E · 한바다 × 온새벽">
 <meta name="theme-color" content="#0E1B26">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400&family=IBM+Plex+Mono:wght@300&display=swap" rel="stylesheet">
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%235CB0BE'/></svg>">
 
 <style>
-/* ✏️ 색 */
+
 :root{
-  --sea:#0E1B26;                    /* 수면 근처 배경 */
+  --sea:#0E1B26;
   --ink:#B9C9D4;
   --faint:#5E7381;
   --hair:rgba(150,180,196,.28);
-  --current:#5CB0BE;                /* 해일 */
-  --dawn:#EBBB7C;                   /* 디유 */
 
-  /* 수심 0m */
+  --current:#5CB0BE;
+  --dawn:#EBBB7C;
+
   --surface-sky:#D9F0FF;
   --surface-gold:#FFFAED;
 }
-*{box-sizing:border-box;margin:0;padding:0}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
 html{
   scroll-behavior:smooth;
   scroll-snap-type:y mandatory;
 }
+
 body{
-  /* 0m: 밝은 하늘색 → 밝은 금색 */
+
   background:
-    radial-gradient(ellipse at 78% 7%,
+    radial-gradient(
+      ellipse at 78% 7%,
       rgba(255,250,237,.82) 0%,
       rgba(255,250,237,.25) 12%,
-      rgba(255,250,237,0) 30%),
-    radial-gradient(ellipse at 72% 20%,
+      rgba(255,250,237,0) 30%
+    ),
+
+    radial-gradient(
+      ellipse at 72% 20%,
       rgba(245,252,255,.22) 0%,
       rgba(245,252,255,.08) 24%,
-      rgba(245,252,255,0) 50%),
-    radial-gradient(ellipse at 18% 80%,
+      rgba(245,252,255,0) 50%
+    ),
+
+    radial-gradient(
+      ellipse at 18% 80%,
       rgba(224,245,255,.16) 0%,
       rgba(224,245,255,.05) 26%,
-      rgba(224,245,255,0) 54%),
-    linear-gradient(180deg,
+      rgba(224,245,255,0) 54%
+    ),
+
+    linear-gradient(
+      180deg,
       #D9F0FF 0%,
       #CEEAFB 44%,
-      #BEE7FA 100%);
+      #BEE7FA 100%
+    );
+
   color:var(--ink);
-  font-family:"IBM Plex Sans KR",-apple-system,sans-serif;
-  font-weight:200;font-size:14px;line-height:2.05;letter-spacing:.06em;
-  padding:0 26px;-webkit-font-smoothing:antialiased;
+
+  font-family:
+    "IBM Plex Sans KR",
+    -apple-system,
+    sans-serif;
+
+  font-weight:200;
+  font-size:14px;
+  line-height:2.05;
+  letter-spacing:.06em;
+
+  padding:0 26px;
+
+  -webkit-font-smoothing:antialiased;
+
   overscroll-behavior-y:contain;
 }
-.mono{font-family:"IBM Plex Mono",monospace;font-weight:300}
 
-/* 내려갈수록 어두워지는 층 */
+.mono{
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
+}
+
+
+/* ─────────────────────────────
+   심해 배경 레이어
+───────────────────────────── */
+
 #dark{
   position:fixed;
   inset:0;
+
   background:#07131F;
+
   opacity:0;
+
   z-index:-1;
+
   pointer-events:none;
 }
 
-/* 고정 수심계 */
-.hud{position:fixed;top:20px;right:24px;z-index:10;text-align:right;
-     font-family:"IBM Plex Mono",monospace;font-weight:300;letter-spacing:.18em}
-.hud .d{font-size:.92rem;color:var(--ink)}
-.hud .p{font-size:.66rem;color:var(--faint);margin-top:2px}
 
-/* 오른쪽 수심 축 */
+/* ─────────────────────────────
+   우측 상단 현재 수심
+───────────────────────────── */
+
+.hud{
+  position:fixed;
+
+  top:20px;
+  right:24px;
+
+  z-index:10;
+
+  text-align:right;
+
+  font-family:"IBM Plex Mono",monospace;
+  font-weight:300;
+
+  letter-spacing:.18em;
+}
+
+.hud .d{
+  font-size:.92rem;
+  color:var(--ink);
+}
+
+.hud .p{
+  font-size:.66rem;
+  color:var(--faint);
+  margin-top:2px;
+}
+
+
+/* ─────────────────────────────
+   왼쪽 수심축
+───────────────────────────── */
+
 .axis{
   position:fixed;
+
   top:14vh;
   bottom:14vh;
 
-  /* 중앙 본문 왼쪽에 붙는 수심축 */
   left:calc(50% - 20rem);
+
   right:auto;
 
   width:1px;
+
   background:var(--hair);
+
   z-index:9;
 }
+
 .axis i{
   position:absolute;
+
   left:0;
+
   width:7px;
   height:1px;
+
   background:var(--hair);
 }
+
 .axis b{
   position:absolute;
+
   right:12px;
+
   font-family:"IBM Plex Mono",monospace;
+
   font-weight:300;
+
   font-size:.6rem;
+
   letter-spacing:.14em;
+
   color:var(--faint);
+
   white-space:nowrap;
+
   transform:translateY(-50%);
 }
+
 .axis .mk{
   position:absolute;
+
   left:-3px;
+
   width:7px;
   height:7px;
+
   border-radius:50%;
+
   background:var(--current);
+
   transform:translate(0,-50%);
 }
 
 
-/* 각 층 */
+/* ─────────────────────────────
+   고정 배너
+───────────────────────────── */
 
-/* ── 화면 고정 배너 ──
-   수심축과 함께 움직이지 않고 고정.
-   이후 실제 이미지 여러 장을 이 안에서 crossfade 할 예정. */
 .fixed-banner{
   position:fixed;
+
   top:14vh;
 
-  /* 기본: 본문 칼럼과 같은 중심 */
   left:50%;
+
   transform:translateX(-50%);
 
-  width:min(31rem, calc(100vw - 52px));
+  width:min(
+    31rem,
+    calc(100vw - 52px)
+  );
+
   aspect-ratio:3 / 1;
+
   max-height:170px;
 
   overflow:hidden;
+
   z-index:8;
 
   border:1px solid var(--hair);
+
   background:
-    linear-gradient(135deg, rgba(235,187,124,.035), transparent 45%),
+    linear-gradient(
+      135deg,
+      rgba(235,187,124,.035),
+      transparent 45%
+    ),
     rgba(255,255,255,.012);
 }
 
-/* ── 고정 배너 크로스페이드 ── */
+
+/* 배너 이미지 */
+
 .banner-slide{
   position:absolute;
+
   inset:0;
+
   width:100%;
   height:100%;
+
   object-fit:cover;
   object-position:center center;
 
   opacity:0;
-  transition:opacity 1.35s ease-in-out;
+
+  transition:
+    opacity 1.35s ease-in-out;
 
   pointer-events:none;
+
   user-select:none;
+
   -webkit-user-drag:none;
 }
 
@@ -165,41 +282,58 @@ body{
   opacity:1;
 }
 
-/* 이미지 위에 아주 얇은 유리막 느낌만 남김 */
+
+/* 배너 위 아주 얇은 유리막 */
+
 .fixed-banner::after{
   content:"";
+
   position:absolute;
+
   inset:0;
+
   z-index:2;
+
   pointer-events:none;
 
   background:
-    linear-gradient(180deg,
+    linear-gradient(
+      180deg,
       rgba(255,255,255,.035),
       rgba(255,255,255,0) 42%,
-      rgba(8,24,38,.035));
+      rgba(8,24,38,.035)
+    );
 }
 
 @media (prefers-reduced-motion:reduce){
+
   .banner-slide{
     transition:none;
   }
+
 }
 
-/* 고정 배너와 본문 사이의 시각적 간격.
-   본문만 스크롤되며 배너는 제자리에 남는다. */
+
+/* ─────────────────────────────
+   본문
+───────────────────────────── */
+
 .wrap{
   max-width:33rem;
+
   margin:0 auto;
 }
 
+
 .blk{
   min-height:100svh;
+
   display:flex;
+
   flex-direction:column;
+
   justify-content:flex-start;
 
-  /* 고정 배너 바로 아래가 모든 본문 박스의 착지 위치 */
   padding:
     calc(14vh + 170px + 42px)
     0
@@ -208,462 +342,1994 @@ body{
   max-width:31rem;
 
   scroll-snap-align:start;
+
   scroll-snap-stop:always;
 }
-.stamp{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.68rem;
-       letter-spacing:.24em;color:var(--faint);margin-bottom:6px}
-.zone{font-size:.7rem;letter-spacing:.34em;color:var(--faint);margin-bottom:26px}
-.blk h2{font-size:1rem;font-weight:300;letter-spacing:.32em;margin-bottom:22px;
-        padding-bottom:14px;border-bottom:1px solid var(--hair)}
 
-@media (prefers-reduced-motion:no-preference){
-  .blk{opacity:0;transition:opacity 1s ease}
-  .blk.in{opacity:1}
+
+.stamp{
+  font-family:"IBM Plex Mono",monospace;
+
+  font-weight:300;
+
+  font-size:.68rem;
+
+  letter-spacing:.24em;
+
+  color:var(--faint);
+
+  margin-bottom:6px;
 }
 
-/* 수면 */
+
+.zone{
+  font-size:.7rem;
+
+  letter-spacing:.34em;
+
+  color:var(--faint);
+
+  margin-bottom:26px;
+}
+
+
+.blk h2{
+  font-size:1rem;
+
+  font-weight:300;
+
+  letter-spacing:.32em;
+
+  margin-bottom:22px;
+
+  padding-bottom:14px;
+
+  border-bottom:
+    1px solid var(--hair);
+}
+
+
+@media (prefers-reduced-motion:no-preference){
+
+  .blk{
+    opacity:0;
+
+    transition:
+      opacity 1s ease;
+  }
+
+  .blk.in{
+    opacity:1;
+  }
+
+}
+
+
+/* ─────────────────────────────
+   0m 메인
+───────────────────────────── */
+
 .top{
   min-height:100svh;
+
   display:flex;
+
   flex-direction:column;
+
   justify-content:flex-start;
+
   position:relative;
 
-  /* 다른 본문과 동일한 위치에 딱 착지 */
-  padding-top:calc(14vh + 170px + 42px);
+  padding-top:
+    calc(
+      14vh
+      + 170px
+      + 42px
+    );
+
   padding-bottom:9vh;
 
   scroll-snap-align:start;
+
   scroll-snap-stop:always;
 }
-.top .id{font-size:1.15rem;letter-spacing:.34em;margin-bottom:12px}
-.top .slug{font-size:.76rem;letter-spacing:.24em;color:var(--faint);line-height:2.1}
-.glow{position:absolute;left:-40px;top:-30px;width:230px;height:230px;border-radius:50%;
-      background:radial-gradient(circle,rgba(235,187,124,.22),transparent 68%);pointer-events:none}
-@media (prefers-reduced-motion:no-preference){
-  .glow{animation:tide 8s ease-in-out infinite}
-  @keyframes tide{0%,100%{opacity:.7}50%{opacity:1}}
+
+
+.top .id{
+  font-size:1.15rem;
+
+  letter-spacing:.34em;
+
+  margin-bottom:12px;
 }
-.scroll{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
-        letter-spacing:.3em;color:var(--faint);margin-top:44px}
 
-.spec{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.74rem;
-      letter-spacing:.16em;color:var(--faint);line-height:2.3;margin-bottom:16px}
-.body{font-size:.87rem;line-height:2.35}
 
-.info{display:grid;grid-template-columns:6rem 1fr}
-.info dt{color:var(--faint);font-size:.78rem;padding:8px 0;border-bottom:1px solid var(--hair)}
-.info dd{padding:8px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
-.info dt:last-of-type,.info dd:last-of-type{border-bottom:none}
+.top .slug{
+  font-size:.76rem;
 
-.rules{margin-bottom:22px}
-.rules h3{font-size:.76rem;font-weight:300;letter-spacing:.2em;color:var(--faint);margin-bottom:6px}
-.rules ul{list-style:none}
-.rules li{position:relative;padding-left:1.5rem;font-size:.84rem;margin-bottom:3px}
-.rules li::before{position:absolute;left:0;top:0;font-size:.68rem}
-.ok li::before{content:"○";color:var(--current)}
-.no li::before{content:"✕";color:var(--faint)}
+  letter-spacing:.24em;
 
-.links{list-style:none}
-.links li{padding:7px 0;border-bottom:1px solid var(--hair);font-size:.84rem}
-.links li:last-child{border-bottom:none}
-.links .label{color:var(--faint);font-size:.76rem;letter-spacing:.2em;display:inline-block;width:5.8rem}
-a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
-a:hover{border-color:var(--current)}
+  color:var(--faint);
 
-.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
-.tags span{font-size:.72rem;padding:2px 11px;border:1px solid var(--hair);border-radius:99px;color:var(--faint)}
+  line-height:2.1;
+}
 
-.floor{border-top:1px solid var(--hair);margin-top:30px;padding-top:22px;
-       font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
-       letter-spacing:.24em;color:var(--faint)}
 
-/* PC에서는 본문(.wrap 33rem)의 실제 왼쪽 시작선에
-   배너의 왼쪽 선을 정확히 맞춤 */
+.glow{
+  position:absolute;
+
+  left:-40px;
+  top:-30px;
+
+  width:230px;
+  height:230px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(235,187,124,.22),
+      transparent 68%
+    );
+
+  pointer-events:none;
+}
+
+
+@media (prefers-reduced-motion:no-preference){
+
+  .glow{
+    animation:
+      tide 8s
+      ease-in-out
+      infinite;
+  }
+
+  @keyframes tide{
+
+    0%,
+    100%{
+      opacity:.7;
+    }
+
+    50%{
+      opacity:1;
+    }
+
+  }
+
+}
+
+
+.scroll{
+  font-family:"IBM Plex Mono",monospace;
+
+  font-weight:300;
+
+  font-size:.66rem;
+
+  letter-spacing:.3em;
+
+  color:var(--faint);
+
+  margin-top:44px;
+}
+
+
+.spec{
+  font-family:"IBM Plex Mono",monospace;
+
+  font-weight:300;
+
+  font-size:.74rem;
+
+  letter-spacing:.16em;
+
+  color:var(--faint);
+
+  line-height:2.3;
+
+  margin-bottom:16px;
+}
+
+
+.body{
+  font-size:.87rem;
+
+  line-height:2.35;
+}
+
+
+.info{
+  display:grid;
+
+  grid-template-columns:
+    6rem 1fr;
+}
+
+
+.info dt{
+  color:var(--faint);
+
+  font-size:.78rem;
+
+  padding:8px 0;
+
+  border-bottom:
+    1px solid var(--hair);
+}
+
+
+.info dd{
+  padding:8px 0;
+
+  border-bottom:
+    1px solid var(--hair);
+
+  font-size:.84rem;
+}
+
+
+.info dt:last-of-type,
+.info dd:last-of-type{
+  border-bottom:none;
+}
+
+
+.rules{
+  margin-bottom:22px;
+}
+
+
+.rules h3{
+  font-size:.76rem;
+
+  font-weight:300;
+
+  letter-spacing:.2em;
+
+  color:var(--faint);
+
+  margin-bottom:6px;
+}
+
+
+.rules ul{
+  list-style:none;
+}
+
+
+.rules li{
+  position:relative;
+
+  padding-left:1.5rem;
+
+  font-size:.84rem;
+
+  margin-bottom:3px;
+}
+
+
+.rules li::before{
+  position:absolute;
+
+  left:0;
+  top:0;
+
+  font-size:.68rem;
+}
+
+
+.ok li::before{
+  content:"○";
+
+  color:var(--current);
+}
+
+
+.no li::before{
+  content:"✕";
+
+  color:var(--faint);
+}
+
+
+.links{
+  list-style:none;
+}
+
+
+.links li{
+  padding:7px 0;
+
+  border-bottom:
+    1px solid var(--hair);
+
+  font-size:.84rem;
+}
+
+
+.links li:last-child{
+  border-bottom:none;
+}
+
+
+.links .label{
+  color:var(--faint);
+
+  font-size:.76rem;
+
+  letter-spacing:.2em;
+
+  display:inline-block;
+
+  width:5.8rem;
+}
+
+
+a{
+  color:var(--current);
+
+  text-decoration:none;
+
+  border-bottom:
+    1px solid var(--hair);
+}
+
+
+a:hover{
+  border-color:
+    var(--current);
+}
+
+
+.tags{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  margin-top:20px;
+}
+
+
+.tags span{
+  font-size:.72rem;
+
+  padding:2px 11px;
+
+  border:
+    1px solid var(--hair);
+
+  border-radius:99px;
+
+  color:var(--faint);
+}
+
+
+.floor{
+  border-top:
+    1px solid var(--hair);
+
+  margin-top:30px;
+
+  padding-top:22px;
+
+  font-family:"IBM Plex Mono",monospace;
+
+  font-weight:300;
+
+  font-size:.66rem;
+
+  letter-spacing:.24em;
+
+  color:var(--faint);
+}
+
+
+/* ─────────────────────────────
+   PC
+───────────────────────────── */
+
 @media (min-width:901px){
+
   .fixed-banner{
     left:calc(50% - 16.5rem);
+
     transform:none;
   }
+
 }
 
+
+/* ─────────────────────────────
+   태블릿
+───────────────────────────── */
+
 @media (max-width:900px){
-  .axis{left:26px}
-  .wrap{max-width:31rem}
+
+  .axis{
+    left:26px;
+  }
+
+  .wrap{
+    max-width:31rem;
+  }
+
 }
-@media (max-width:640px){.axis{display:none}}
+
+
+@media (max-width:640px){
+
+  .axis{
+    display:none;
+  }
+
+}
+
+
+/* ─────────────────────────────
+   모바일
+───────────────────────────── */
+
 @media (max-width:520px){
-  body{padding:0 20px;font-size:13px}
-  .hud{top:14px;right:18px}
-  .info{grid-template-columns:5rem 1fr}
+
+  body{
+    padding:0 20px;
+
+    font-size:13px;
+  }
+
+
+  .hud{
+    top:14px;
+
+    right:18px;
+  }
+
+
+  .info{
+    grid-template-columns:
+      5rem 1fr;
+  }
+
 
   .fixed-banner{
     top:72px;
-    width:calc(100vw - 40px);
-    aspect-ratio:2.7 / 1;
+
+    width:
+      calc(100vw - 40px);
+
+    aspect-ratio:
+      2.7 / 1;
   }
+
 
   .top,
   .blk{
     min-height:100svh;
-    padding-top:calc(72px + (100vw - 40px)/2.7 + 28px);
+
+    padding-top:
+      calc(
+        72px
+        +
+        (100vw - 40px)/2.7
+        +
+        28px
+      );
+
     padding-bottom:54px;
   }
+
 }
+
 </style>
 </head>
+
+
 <body>
+
 
 <div id="dark"></div>
 
+
+<!-- ─────────────────────────────
+     현재 수심
+───────────────────────────── -->
+
 <div class="hud">
-  <div class="d" id="hud-d">- 0 0 0 0 0 M</div>
-  <div class="p" id="hud-p">1 B A R</div>
+
+  <div
+    class="d"
+    id="hud-d"
+  >
+    - 0 0 0 0 0 M
+  </div>
+
+  <div
+    class="p"
+    id="hud-p"
+  >
+    1 B A R
+  </div>
+
 </div>
 
-<div class="axis" id="axis">
-  <i style="top:0%"></i>      <b style="top:0%">0</b>
-  <i style="top:18%"></i>     <b style="top:18%">- 2 0 0 0</b>
-  <i style="top:37%"></i>     <b style="top:37%">- 4 0 0 0</b>
-  <i style="top:55%"></i>     <b style="top:55%">- 6 0 0 0</b>
-  <i style="top:73%"></i>     <b style="top:73%">- 8 0 0 0</b>
-  <i style="top:100%"></i>    <b style="top:100%">- 1 0 9 3 5</b>
-  <span class="mk" id="mk" style="top:0%"></span>
+
+<!-- ─────────────────────────────
+     수심축
+───────────────────────────── -->
+
+<div
+  class="axis"
+  id="axis"
+>
+
+  <i style="top:0%"></i>
+
+  <b style="top:0%">
+    0
+  </b>
+
+
+  <i style="top:18%"></i>
+
+  <b style="top:18%">
+    - 2 0 0 0
+  </b>
+
+
+  <i style="top:37%"></i>
+
+  <b style="top:37%">
+    - 4 0 0 0
+  </b>
+
+
+  <i style="top:55%"></i>
+
+  <b style="top:55%">
+    - 6 0 0 0
+  </b>
+
+
+  <i style="top:73%"></i>
+
+  <b style="top:73%">
+    - 8 0 0 0
+  </b>
+
+
+  <i style="top:100%"></i>
+
+  <b style="top:100%">
+    - 1 0 9 3 5
+  </b>
+
+
+  <span
+    class="mk"
+    id="mk"
+    style="top:0%"
+  ></span>
+
 </div>
 
-<!-- ── 수심축과 함께 화면에 고정되는 배너 ── -->
-<div class="fixed-banner" id="fixedBanner" aria-hidden="true">
-  <img class="banner-slide active" src="images/banner1.jpg" alt="" decoding="async">
-  <img class="banner-slide" src="images/banner2.jpg" alt="" decoding="async">
-  <img class="banner-slide" src="images/banner3.jpg" alt="" decoding="async">
-  <img class="banner-slide" src="images/banner4.jpg" alt="" decoding="async">
-  <img class="banner-slide" src="images/banner5.jpg" alt="" decoding="async">
-  <img class="banner-slide" src="images/banner6.jpg" alt="" decoding="async">
+
+<!-- ─────────────────────────────
+     고정 이미지 배너
+───────────────────────────── -->
+
+<div
+  class="fixed-banner"
+  id="fixedBanner"
+  aria-hidden="true"
+>
+
+  <img
+    class="banner-slide active"
+    src="images/banner1.jpg"
+    alt=""
+    decoding="async"
+  >
+
+  <img
+    class="banner-slide"
+    src="images/banner2.jpg"
+    alt=""
+    decoding="async"
+  >
+
+  <img
+    class="banner-slide"
+    src="images/banner3.jpg"
+    alt=""
+    decoding="async"
+  >
+
+  <img
+    class="banner-slide"
+    src="images/banner4.jpg"
+    alt=""
+    decoding="async"
+  >
+
+  <img
+    class="banner-slide"
+    src="images/banner5.jpg"
+    alt=""
+    decoding="async"
+  >
+
+  <img
+    class="banner-slide"
+    src="images/banner6.jpg"
+    alt=""
+    decoding="async"
+  >
+
 </div>
+
+
+<!-- ─────────────────────────────
+     본문
+───────────────────────────── -->
 
 <div class="wrap">
 
-  <!-- ✏️ 수면 -->
-  <header class="top" data-depth="0">
+
+  <!-- 0m -->
+
+  <header
+    class="top"
+    data-depth="0"
+  >
+
     <div class="glow"></div>
-    <p class="id">닉네임</p>
-    <p class="slug">
-      한바다 드림 계정<br>
-      11°22′N 142°35′E · 마리아나 해구<br>
-      haeil.love
+
+
+    <p class="id">
+      닉네임
     </p>
-    <p class="scroll">아 래 로 　내 려 갑 니 다</p>
+
+
+    <p class="slug">
+
+      한바다 드림 계정<br>
+
+      11°22′N 142°35′E · 마리아나 해구<br>
+
+      haeil.love
+
+    </p>
+
+
+    <p class="scroll">
+      아 래 로 　내 려 갑 니 다
+    </p>
+
   </header>
 
-  <!-- ✏️ 디유 · 수면 -->
 
-<section class="blk" data-depth="8400" data-color-depth="9300">
-    <p class="stamp">- 0 8 4 0 0 M · 8 3 4 B A R · 1 ~ 4 ℃</p>
-    <p class="zone">해 　구 　하 　부</p>
-    <h2 style="color:var(--current)">해 일</h2>
-    <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
+  <!-- -8400m -->
+
+  <section
+    class="blk"
+    data-depth="8400"
+    data-color-depth="9300"
+  >
+
+    <p class="stamp">
+      - 0 8 4 0 0 M · 8 3 4 B A R · 1 ~ 4 ℃
+    </p>
+
+
+    <p class="zone">
+      해 　구 　하 　부
+    </p>
+
+
+    <h2
+      style="color:var(--current)"
+    >
+      해 일
+    </h2>
+
+
+    <p class="spec">
+      한바다 · SS급 센티넬 · 물의 군주
+    </p>
+
+
     <p class="body">
-      감각이 닿는 범위를 재보라는 말을 들으면 웃는다. 재본 적이 없어서가 아니라,
+
+      감각이 닿는 범위를 재보라는 말을 들으면 웃는다.
+      재본 적이 없어서가 아니라,
       재려고 들면 늘 물이 먼저 끝났기 때문에.
+
     </p>
+
   </section>
 
-  <section class="blk" data-depth="10935">
-    <p class="stamp">- 1 0 9 3 5 M · 1 0 8 6 B A R</p>
-    <p class="zone">각 　인</p>
-    <p class="body">
-      한바다는 자기 감각이 어디까지 뻗어 있는지 세어본 적이 없다. 셀 필요가 없었으니까.
-      온새벽이 손을 얹은 날에야 처음으로, 물이 여기서 끝난다는 걸 알았다.
+
+  <!-- -10935m -->
+
+  <section
+    class="blk"
+    data-depth="10935"
+  >
+
+    <p class="stamp">
+      - 1 0 9 3 5 M · 1 0 8 6 B A R
     </p>
+
+
+    <p class="zone">
+      각 　인
+    </p>
+
+
+    <p class="body">
+
+      한바다는 자기 감각이 어디까지 뻗어 있는지 세어본 적이 없다.
+      셀 필요가 없었으니까.
+      온새벽이 손을 얹은 날에야 처음으로,
+      물이 여기서 끝난다는 걸 알았다.
+
+    </p>
+
+
     <div class="tags">
-      <span>심해 × 새벽</span><span>각인</span><span>쌍방구원</span><span>느린 연애</span>
+
+      <span>
+        심해 × 새벽
+      </span>
+
+      <span>
+        각인
+      </span>
+
+      <span>
+        쌍방구원
+      </span>
+
+      <span>
+        느린 연애
+      </span>
+
     </div>
-    <p class="floor">해 저 　도 　달 　· 　haeil.love</p>
+
+
+    <p class="floor">
+      해 저 　도 　달 　· 　haeil.love
+    </p>
+
   </section>
+
 
 </div>
 
+
 <script>
 (function(){
+
   var MAX=10935,
-      root=document.documentElement,
-      d=document.getElementById('hud-d'),
-      p=document.getElementById('hud-p'),
-      dark=document.getElementById('dark'),
-      mk=document.getElementById('mk'),
-      stations=[].slice.call(document.querySelectorAll('[data-depth]')),
-      depths=stations.map(function(el){return +el.dataset.depth}),
-      colorDepths=stations.map(function(el){
-        return +(el.dataset.colorDepth || el.dataset.depth);
-      }),
+
+      root=
+        document.documentElement,
+
+      d=
+        document.getElementById(
+          'hud-d'
+        ),
+
+      p=
+        document.getElementById(
+          'hud-p'
+        ),
+
+      dark=
+        document.getElementById(
+          'dark'
+        ),
+
+      mk=
+        document.getElementById(
+          'mk'
+        ),
+
+      stations=
+        [].slice.call(
+          document.querySelectorAll(
+            '[data-depth]'
+          )
+        ),
+
+      depths=
+        stations.map(
+          function(el){
+
+            return +el.dataset.depth;
+
+          }
+        ),
+
+      colorDepths=
+        stations.map(
+          function(el){
+
+            return +(
+              el.dataset.colorDepth
+              ||
+              el.dataset.depth
+            );
+
+          }
+        ),
+
       tick=false;
 
+
+
   function pad(n){
-    var s=String(n);while(s.length<5)s='0'+s;
-    return s.split('').join(' ');
-  }
 
-  function clamp(v){
-    return v<0?0:v>1?1:v;
-  }
-
-  function mixColor(a,b,t){
-    return [
-      Math.round(a[0]+(b[0]-a[0])*t),
-      Math.round(a[1]+(b[1]-a[1])*t),
-      Math.round(a[2]+(b[2]-a[2])*t)
-    ];
-  }
-
-  function rgb(c){
-    return 'rgb('+c[0]+','+c[1]+','+c[2]+')';
-  }
-
-  function rgba(c,a){
-    return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';
-  }
-
-  function lighten(c,amount){
-    return mixColor(c,[255,255,255],amount);
-  }
-
-  function deepen(c,amount){
-    return mixColor(c,[5,20,34],amount);
-  }
-
-  /* ─────────────────────────────────────────────
-     수심 팔레트
-
-     0m:
-       하늘(#D9F0FF)
-       + 수면 바로 아래의 투명한 밝은 물빛
-       + #FFFAED는 "햇빛"으로만 사용
-
-     이후:
-       맑은 하늘색 → 푸른색 → 짙은 파랑 → 남색 → 심해 남색
-
-     회색 / 갈색 계열을 지나지 않는다.
-  ───────────────────────────────────────────── */
-  var DEPTH_PALETTE=[
-    {
-      d:0,
-      top:[217,240,255],       /* #D9F0FF · 하늘 */
-      bottom:[190,231,250],    /* #BEE7FA · 수면 바로 아래 */
-      sun:0.82,
-      ink:[38,64,86],
-      faint:[82,108,128],
-      hair:[58,91,115]
-    },
-    {
-      d:7400,
-      top:[47,106,128],        /* #2F6A80 */
-      bottom:[22,63,88],       /* #163F58 */
-      sun:0,
-      ink:[232,244,250],
-      faint:[177,200,215],
-      hair:[151,184,204]
-    },
-    {
-      d:9300,
-      top:[24,57,83],          /* #183953 */
-      bottom:[12,38,62],       /* #0C263E */
-      sun:0,
-      ink:[221,237,246],
-      faint:[142,169,187],
-      hair:[129,161,181]
-    },
-    {
-      d:10935,
-      top:[14,27,38],          /* 기존 심해 끝점 */
-      bottom:[7,19,31],        /* 기존 심해감 */
-      sun:0,
-      ink:[185,201,212],
-      faint:[94,115,129],
-      hair:[150,180,196]
-    }
-  ];
-
-  function paletteAt(dep){
-    var i=0;
+    var s=
+      String(n);
 
     while(
-      i<DEPTH_PALETTE.length-2 &&
-      dep>DEPTH_PALETTE[i+1].d
+      s.length<5
     ){
-      i++;
+
+      s='0'+s;
+
     }
 
-    var a=DEPTH_PALETTE[i],
-        b=DEPTH_PALETTE[i+1],
-        span=Math.max(1,b.d-a.d),
-        t=clamp((dep-a.d)/span);
-
-    /* 스냅 사이에서도 부드럽게 물색이 변하도록 */
-    t=t*t*(3-2*t);
-
-    return{
-      top:mixColor(a.top,b.top,t),
-      bottom:mixColor(a.bottom,b.bottom,t),
-      sun:a.sun+(b.sun-a.sun)*t,
-      ink:mixColor(a.ink,b.ink,t),
-      faint:mixColor(a.faint,b.faint,t),
-      hair:mixColor(a.hair,b.hair,t)
-    };
+    return s
+      .split('')
+      .join(' ');
   }
 
-  /* 현재 스크롤 위치를 '정류장 실제 수심' 사이에서 보간 */
-  function depthNow(){
-    var y=window.scrollY;
 
-    for(var i=stations.length-1;i>=0;i--){
-      var top=stations[i].offsetTop;
 
-      if(y>=top-2){
-        if(i===stations.length-1){
-          return depths[i];
-        }
+  function clamp(v){
 
-        var nextTop=stations[i+1].offsetTop,
-            span=Math.max(1,nextTop-top),
-            t=clamp((y-top)/span);
-
-        return depths[i]+(depths[i+1]-depths[i])*t;
-      }
-    }
-
-    return depths[0] || 0;
+    return v<0
+      ? 0
+      : v>1
+        ? 1
+        : v;
   }
 
-  /* 배경색 전용 수심.
-     수치/축은 5200m로 바뀌어도 해당 지점의 색은 기존 7400m 색을 유지한다. */
-  function colorDepthNow(){
-    var y=window.scrollY;
 
-    for(var i=stations.length-1;i>=0;i--){
-      var top=stations[i].offsetTop;
 
-      if(y>=top-2){
-        if(i===stations.length-1){
-          return colorDepths[i];
-        }
+  function mixColor(
+    a,
+    b,
+    t
+  ){
 
-        var nextTop=stations[i+1].offsetTop,
-            span=Math.max(1,nextTop-top),
-            t=clamp((y-top)/span);
+    return [
 
-        return colorDepths[i]+(colorDepths[i+1]-colorDepths[i])*t;
-      }
-    }
+      Math.round(
+        a[0]
+        +
+        (
+          b[0]-a[0]
+        )*t
+      ),
 
-    return colorDepths[0] || 0;
+      Math.round(
+        a[1]
+        +
+        (
+          b[1]-a[1]
+        )*t
+      ),
+
+      Math.round(
+        a[2]
+        +
+        (
+          b[2]-a[2]
+        )*t
+      )
+
+    ];
+
   }
 
-  function upd(){
-    var rawDepth=depthNow(),
-        visualDepth=colorDepthNow(),
-        dep=Math.round(rawDepth),
-        r=clamp(rawDepth/MAX);
-    d.textContent='- '+pad(dep)+' M';
-    p.textContent=Math.round(1+dep*0.0992).toLocaleString().split('').join(' ')+' B A R';
 
-    /* 실제 수심에 따라 기본 물빛은 깊어지되,
-       모든 구간에서 0m처럼 투명한 색 레이어가 은은하게 겹친다. */
-    var pal=paletteAt(visualDepth),
-        depthRatio=clamp(visualDepth/MAX),
 
-        mistTop=lighten(pal.top,0.34),
-        mistBottom=lighten(pal.bottom,0.20),
-        softDeep=deepen(pal.bottom,0.08),
+  function rgb(c){
 
-        a1=0.28-(depthRatio*0.07),
-        a2=0.21-(depthRatio*0.05),
-        a3=0.15-(depthRatio*0.03),
+    return 'rgb('
+      +
+      c[0]
+      +','
+      +
+      c[1]
+      +','
+      +
+      c[2]
+      +
+      ')';
 
-        mid=mixColor(pal.top,pal.bottom,0.43);
+  }
 
-    document.body.style.background=
-      /* 수면의 금빛 햇빛 — 깊어지면 자연스럽게 사라짐 */
-      'radial-gradient(ellipse at 78% 7%,'+
-        'rgba(255,250,237,'+pal.sun.toFixed(3)+') 0%,'+
-        'rgba(255,250,237,'+(pal.sun*.30).toFixed(3)+') 12%,'+
-        'rgba(255,250,237,0) 30%),'+
 
-      /* 오른쪽 위: 투명한 밝은 물빛 */
-      'radial-gradient(ellipse at 72% 20%,'+
-        rgba(mistTop,a1.toFixed(3))+' 0%,'+
-        rgba(mistTop,(a1*.38).toFixed(3))+' 23%,'+
-        rgba(mistTop,0)+' 50%),'+
 
-      /* 왼쪽 아래: 옅은 푸른 안개 */
-      'radial-gradient(ellipse at 18% 80%,'+
-        rgba(mistBottom,a2.toFixed(3))+' 0%,'+
-        rgba(mistBottom,(a2*.34).toFixed(3))+' 25%,'+
-        rgba(mistBottom,0)+' 54%),'+
+  function rgba(
+    c,
+    a
+  ){
 
-      /* 가운데: 깊은 물색이 아주 미세하게 섞임 */
-      'radial-gradient(ellipse at 56% 58%,'+
-        rgba(softDeep,a3.toFixed(3))+' 0%,'+
-        rgba(softDeep,(a3*.28).toFixed(3))+' 30%,'+
-        rgba(softDeep,0)+' 60%),'+
+    return 'rgba('
+      +
+      c[0]
+      +','
+      +
+      c[1]
+      +','
+      +
+      c[2]
+      +','
+      +
+      a
+      +
+      ')';
 
-      /* 기본 수심 그라데이션 */
-      'linear-gradient(180deg,'+
-        rgb(pal.top)+' 0%,'+
-        rgb(mid)+' 44%,'+
-        rgb(pal.bottom)+' 100%)';
+  }
 
-    /* 수면은 진한 글씨, 깊은 곳은 밝은 글씨 */
-    root.style.setProperty('--ink',rgb(pal.ink));
-    root.style.setProperty('--faint',rgb(pal.faint));
-    root.style.setProperty(
-      '--hair',
-      'rgba('+pal.hair[0]+','+pal.hair[1]+','+pal.hair[2]+',.30)'
+
+
+  function lighten(
+    c,
+    amount
+  ){
+
+    return mixColor(
+      c,
+      [255,255,255],
+      amount
     );
 
-    /* 색을 탁하게 만드는 검은 오버레이는 사용하지 않음 */
+  }
+
+
+
+  function deepen(
+    c,
+    amount
+  ){
+
+    return mixColor(
+      c,
+      [5,20,34],
+      amount
+    );
+
+  }
+
+
+
+  /* ─────────────────────────────
+     수심별 색
+  ───────────────────────────── */
+
+  var DEPTH_PALETTE=[
+
+
+    /* 0m */
+
+    {
+
+      d:0,
+
+      top:[
+        217,
+        240,
+        255
+      ],
+
+      bottom:[
+        190,
+        231,
+        250
+      ],
+
+      sun:.82,
+
+      ink:[
+        38,
+        64,
+        86
+      ],
+
+      faint:[
+        82,
+        108,
+        128
+      ],
+
+      hair:[
+        58,
+        91,
+        115
+      ]
+
+    },
+
+
+    /* 중간 심해색 */
+
+    {
+
+      d:7400,
+
+      top:[
+        47,
+        106,
+        128
+      ],
+
+      bottom:[
+        22,
+        63,
+        88
+      ],
+
+      sun:0,
+
+      ink:[
+        232,
+        244,
+        250
+      ],
+
+      faint:[
+        177,
+        200,
+        215
+      ],
+
+      hair:[
+        151,
+        184,
+        204
+      ]
+
+    },
+
+
+    /* -8400m에서 사용하는 색 */
+
+    {
+
+      d:9300,
+
+      top:[
+        24,
+        57,
+        83
+      ],
+
+      bottom:[
+        12,
+        38,
+        62
+      ],
+
+      sun:0,
+
+      ink:[
+        221,
+        237,
+        246
+      ],
+
+      faint:[
+        142,
+        169,
+        187
+      ],
+
+      hair:[
+        129,
+        161,
+        181
+      ]
+
+    },
+
+
+    /* -10935m */
+
+    {
+
+      d:10935,
+
+      top:[
+        14,
+        27,
+        38
+      ],
+
+      bottom:[
+        7,
+        19,
+        31
+      ],
+
+      sun:0,
+
+      ink:[
+        185,
+        201,
+        212
+      ],
+
+      faint:[
+        94,
+        115,
+        129
+      ],
+
+      hair:[
+        150,
+        180,
+        196
+      ]
+
+    }
+
+  ];
+
+
+
+  function paletteAt(dep){
+
+    var i=0;
+
+
+    while(
+      i
+      <
+      DEPTH_PALETTE.length-2
+      &&
+      dep
+      >
+      DEPTH_PALETTE[i+1].d
+    ){
+
+      i++;
+
+    }
+
+
+    var a=
+          DEPTH_PALETTE[i],
+
+        b=
+          DEPTH_PALETTE[i+1],
+
+        span=
+          Math.max(
+            1,
+            b.d-a.d
+          ),
+
+        t=
+          clamp(
+            (
+              dep-a.d
+            )
+            /
+            span
+          );
+
+
+    t=
+      t*t*(3-2*t);
+
+
+    return{
+
+      top:
+        mixColor(
+          a.top,
+          b.top,
+          t
+        ),
+
+      bottom:
+        mixColor(
+          a.bottom,
+          b.bottom,
+          t
+        ),
+
+      sun:
+        a.sun
+        +
+        (
+          b.sun-a.sun
+        )*t,
+
+      ink:
+        mixColor(
+          a.ink,
+          b.ink,
+          t
+        ),
+
+      faint:
+        mixColor(
+          a.faint,
+          b.faint,
+          t
+        ),
+
+      hair:
+        mixColor(
+          a.hair,
+          b.hair,
+          t
+        )
+
+    };
+
+  }
+
+
+
+  /* ─────────────────────────────
+     현재 수심 계산
+  ───────────────────────────── */
+
+  function depthNow(){
+
+    var y=
+      window.scrollY;
+
+
+    for(
+      var i=
+        stations.length-1;
+
+      i>=0;
+
+      i--
+    ){
+
+      var top=
+        stations[i].offsetTop;
+
+
+      if(
+        y>=top-2
+      ){
+
+        if(
+          i
+          ===
+          stations.length-1
+        ){
+
+          return depths[i];
+
+        }
+
+
+        var nextTop=
+              stations[i+1]
+              .offsetTop,
+
+            span=
+              Math.max(
+                1,
+                nextTop-top
+              ),
+
+            t=
+              clamp(
+                (
+                  y-top
+                )
+                /
+                span
+              );
+
+
+        return depths[i]
+          +
+          (
+            depths[i+1]
+            -
+            depths[i]
+          )
+          *t;
+
+      }
+
+    }
+
+
+    return depths[0] || 0;
+
+  }
+
+
+
+  /* ─────────────────────────────
+     배경색용 수심
+  ───────────────────────────── */
+
+  function colorDepthNow(){
+
+    var y=
+      window.scrollY;
+
+
+    for(
+      var i=
+        stations.length-1;
+
+      i>=0;
+
+      i--
+    ){
+
+      var top=
+        stations[i]
+        .offsetTop;
+
+
+      if(
+        y>=top-2
+      ){
+
+        if(
+          i
+          ===
+          stations.length-1
+        ){
+
+          return colorDepths[i];
+
+        }
+
+
+        var nextTop=
+              stations[i+1]
+              .offsetTop,
+
+            span=
+              Math.max(
+                1,
+                nextTop-top
+              ),
+
+            t=
+              clamp(
+                (
+                  y-top
+                )
+                /
+                span
+              );
+
+
+        return colorDepths[i]
+          +
+          (
+            colorDepths[i+1]
+            -
+            colorDepths[i]
+          )
+          *t;
+
+      }
+
+    }
+
+
+    return colorDepths[0] || 0;
+
+  }
+
+
+
+  /* ─────────────────────────────
+     배경 렌더링
+  ───────────────────────────── */
+
+  function renderBackground(
+    visualDepth
+  ){
+
+    var pal=
+          paletteAt(
+            visualDepth
+          ),
+
+        depthRatio=
+          clamp(
+            visualDepth/MAX
+          ),
+
+        mistTop=
+          lighten(
+            pal.top,
+            .34
+          ),
+
+        mistBottom=
+          lighten(
+            pal.bottom,
+            .20
+          ),
+
+        softDeep=
+          deepen(
+            pal.bottom,
+            .08
+          ),
+
+        a1=
+          .28
+          -
+          (
+            depthRatio*.07
+          ),
+
+        a2=
+          .21
+          -
+          (
+            depthRatio*.05
+          ),
+
+        a3=
+          .15
+          -
+          (
+            depthRatio*.03
+          ),
+
+        mid=
+          mixColor(
+            pal.top,
+            pal.bottom,
+            .43
+          );
+
+
+    document.body.style.background=
+
+
+      'radial-gradient('+
+        'ellipse at 78% 7%,'+
+        'rgba(255,250,237,'+
+        pal.sun.toFixed(3)+
+        ') 0%,'+
+        'rgba(255,250,237,'+
+        (pal.sun*.30).toFixed(3)+
+        ') 12%,'+
+        'rgba(255,250,237,0) 30%'+
+      '),'+
+
+
+      'radial-gradient('+
+        'ellipse at 72% 20%,'+
+        rgba(
+          mistTop,
+          a1.toFixed(3)
+        )+
+        ' 0%,'+
+        rgba(
+          mistTop,
+          (a1*.38).toFixed(3)
+        )+
+        ' 23%,'+
+        rgba(
+          mistTop,
+          0
+        )+
+        ' 50%'+
+      '),'+
+
+
+      'radial-gradient('+
+        'ellipse at 18% 80%,'+
+        rgba(
+          mistBottom,
+          a2.toFixed(3)
+        )+
+        ' 0%,'+
+        rgba(
+          mistBottom,
+          (a2*.34).toFixed(3)
+        )+
+        ' 25%,'+
+        rgba(
+          mistBottom,
+          0
+        )+
+        ' 54%'+
+      '),'+
+
+
+      'radial-gradient('+
+        'ellipse at 56% 58%,'+
+        rgba(
+          softDeep,
+          a3.toFixed(3)
+        )+
+        ' 0%,'+
+        rgba(
+          softDeep,
+          (a3*.28).toFixed(3)
+        )+
+        ' 30%,'+
+        rgba(
+          softDeep,
+          0
+        )+
+        ' 60%'+
+      '),'+
+
+
+      'linear-gradient('+
+        '180deg,'+
+        rgb(
+          pal.top
+        )+
+        ' 0%,'+
+        rgb(
+          mid
+        )+
+        ' 44%,'+
+        rgb(
+          pal.bottom
+        )+
+        ' 100%'+
+      ')';
+
+
+    root.style.setProperty(
+      '--ink',
+      rgb(
+        pal.ink
+      )
+    );
+
+
+    root.style.setProperty(
+      '--faint',
+      rgb(
+        pal.faint
+      )
+    );
+
+
+    root.style.setProperty(
+      '--hair',
+
+      'rgba('
+      +
+      pal.hair[0]
+      +','
+      +
+      pal.hair[1]
+      +','
+      +
+      pal.hair[2]
+      +
+      ',.30)'
+    );
+
+
     dark.style.opacity='0';
 
-    mk.style.top=(r*100)+'%';
-    tick=false;
   }
-  window.addEventListener('scroll',function(){
-    if(!tick){tick=true;requestAnimationFrame(upd)}
-  },{passive:true});
-  window.addEventListener('resize',upd);
+
+
+
+  /* ─────────────────────────────
+     배경색 느린 페이드
+  ───────────────────────────── */
+
+  var bgDepthCurrent=0,
+
+      bgDepthTarget=0,
+
+      bgLastTime=0,
+
+      bgRAF=0,
+
+      BG_TIME_CONSTANT=1700;
+
+
+
+  function runBackgroundFade(
+    now
+  ){
+
+    if(
+      !bgLastTime
+    ){
+
+      bgLastTime=now;
+
+    }
+
+
+    var dt=
+          Math.min(
+            64,
+            now-bgLastTime
+          );
+
+
+    bgLastTime=now;
+
+
+    var alpha=
+      1
+      -
+      Math.exp(
+        -dt
+        /
+        BG_TIME_CONSTANT
+      );
+
+
+    bgDepthCurrent
+      +=
+      (
+        bgDepthTarget
+        -
+        bgDepthCurrent
+      )
+      *
+      alpha;
+
+
+    renderBackground(
+      bgDepthCurrent
+    );
+
+
+    if(
+      Math.abs(
+        bgDepthTarget
+        -
+        bgDepthCurrent
+      )
+      >
+      .7
+    ){
+
+      bgRAF=
+        requestAnimationFrame(
+          runBackgroundFade
+        );
+
+    }
+
+    else{
+
+      bgDepthCurrent=
+        bgDepthTarget;
+
+
+      renderBackground(
+        bgDepthCurrent
+      );
+
+
+      bgRAF=0;
+
+      bgLastTime=0;
+
+    }
+
+  }
+
+
+
+  function setBackgroundTarget(
+    depth
+  ){
+
+    bgDepthTarget=
+      depth;
+
+
+    if(
+      !bgRAF
+    ){
+
+      bgRAF=
+        requestAnimationFrame(
+          runBackgroundFade
+        );
+
+    }
+
+  }
+
+
+
+  /* ─────────────────────────────
+     스크롤 업데이트
+  ───────────────────────────── */
+
+  function upd(){
+
+    var rawDepth=
+          depthNow(),
+
+        visualDepth=
+          colorDepthNow(),
+
+        dep=
+          Math.round(
+            rawDepth
+          ),
+
+        r=
+          clamp(
+            rawDepth/MAX
+          );
+
+
+    d.textContent=
+      '- '
+      +
+      pad(dep)
+      +
+      ' M';
+
+
+    p.textContent=
+      Math.round(
+        1
+        +
+        dep*.0992
+      )
+      .toLocaleString()
+      .split('')
+      .join(' ')
+      +
+      ' B A R';
+
+
+    setBackgroundTarget(
+      visualDepth
+    );
+
+
+    mk.style.top=
+      (
+        r*100
+      )
+      +
+      '%';
+
+
+    tick=false;
+
+  }
+
+
+
+  window.addEventListener(
+    'scroll',
+
+    function(){
+
+      if(
+        !tick
+      ){
+
+        tick=true;
+
+        requestAnimationFrame(
+          upd
+        );
+
+      }
+
+    },
+
+    {
+      passive:true
+    }
+  );
+
+
+
+  window.addEventListener(
+    'resize',
+    upd
+  );
+
+
+
+  /* 첫 로드 */
+
+  bgDepthCurrent=
+    colorDepthNow();
+
+
+  bgDepthTarget=
+    bgDepthCurrent;
+
+
+  renderBackground(
+    bgDepthCurrent
+  );
+
+
   upd();
 
-  if('IntersectionObserver' in window){
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})
-    },{threshold:.18});
-    document.querySelectorAll('.blk').forEach(function(b){io.observe(b)});
-  }else{
-    document.querySelectorAll('.blk').forEach(function(b){b.classList.add('in')});
+
+
+  /* 본문 페이드인 */
+
+  if(
+    'IntersectionObserver'
+    in
+    window
+  ){
+
+    var io=
+      new IntersectionObserver(
+
+        function(es){
+
+          es.forEach(
+            function(e){
+
+              if(
+                e.isIntersecting
+              ){
+
+                e.target
+                .classList
+                .add('in');
+
+              }
+
+            }
+          );
+
+        },
+
+        {
+          threshold:.18
+        }
+
+      );
+
+
+    document
+      .querySelectorAll(
+        '.blk'
+      )
+      .forEach(
+        function(b){
+
+          io.observe(b);
+
+        }
+      );
+
   }
+
+  else{
+
+    document
+      .querySelectorAll(
+        '.blk'
+      )
+      .forEach(
+        function(b){
+
+          b.classList.add(
+            'in'
+          );
+
+        }
+      );
+
+  }
+
 })();
 </script>
+
+
+<!-- ─────────────────────────────
+     배너 크로스페이드
+───────────────────────────── -->
 
 <script>
 (function(){
-  var slides=[].slice.call(document.querySelectorAll('.banner-slide'));
-  if(slides.length<2)return;
+
+  var slides=
+    [].slice.call(
+      document.querySelectorAll(
+        '.banner-slide'
+      )
+    );
+
+
+  if(
+    slides.length<2
+  ){
+
+    return;
+
+  }
+
 
   var current=0;
-  var reduce=window.matchMedia &&
-             window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if(reduce)return;
 
-  window.setInterval(function(){
-    var next=(current+1)%slides.length;
+  var reduce=
+    window.matchMedia
+    &&
+    window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
 
-    slides[next].classList.add('active');
-    slides[current].classList.remove('active');
 
-    current=next;
-  },4500);
+  if(
+    reduce
+  ){
+
+    return;
+
+  }
+
+
+  window.setInterval(
+
+    function(){
+
+      var next=
+        (
+          current+1
+        )
+        %
+        slides.length;
+
+
+      slides[next]
+        .classList
+        .add('active');
+
+
+      slides[current]
+        .classList
+        .remove('active');
+
+
+      current=
+        next;
+
+    },
+
+    4500
+
+  );
+
 })();
 </script>
+
 
 </body>
 </html>
