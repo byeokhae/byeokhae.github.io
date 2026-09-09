@@ -963,6 +963,100 @@ body.intro-ready .hud{
   transition:opacity 1.8s ease 1.05s;
 }
 
+  /* ─────────────────────────────
+   심해에 닿은 빛
+───────────────────────────── */
+
+#abyss-light{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  overflow:hidden;
+  opacity:0;
+
+  background:
+    radial-gradient(
+      ellipse 58vw 32vh at 60% -10%,
+      rgba(169,218,126,.50) 0%,
+      rgba(169,218,126,.13) 42%,
+      rgba(169,218,126,0) 74%
+    ),
+    linear-gradient(
+      179deg,
+      rgba(169,218,126,.15) 0%,
+      rgba(169,218,126,.04) 36%,
+      rgba(169,218,126,0) 66%
+    );
+}
+
+#abyss-light span{
+  position:absolute;
+  top:-20vh;
+  height:155vh;
+  transform-origin:50% 0;
+  transform:rotate(var(--rot));
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(186,230,150,.40) 0%,
+      rgba(186,230,150,.13) 40%,
+      rgba(186,230,150,0) 80%
+    );
+}
+
+#abyss-light .r1{
+  left:44%;
+  width:13vw;
+  --rot:-9deg;
+  filter:blur(34px);
+}
+
+#abyss-light .r2{
+  left:56%;
+  width:7vw;
+  --rot:-2deg;
+  filter:blur(22px);
+  opacity:.8;
+}
+
+#abyss-light .r3{
+  left:64%;
+  width:17vw;
+  --rot:6deg;
+  filter:blur(50px);
+  opacity:.65;
+}
+
+#abyss-light .r4{
+  left:76%;
+  width:5vw;
+  --rot:12deg;
+  filter:blur(20px);
+  opacity:.5;
+}
+
+@media (prefers-reduced-motion:no-preference){
+
+  #abyss-light span{
+    animation:sway 16s ease-in-out infinite alternate;
+  }
+
+  #abyss-light .r2{ animation-duration:21s; animation-delay:-6s; }
+  #abyss-light .r3{ animation-duration:26s; animation-delay:-11s; }
+  #abyss-light .r4{ animation-duration:19s; animation-delay:-3s; }
+
+  @keyframes sway{
+    from{
+      transform:rotate(var(--rot)) translateY(0);
+    }
+    to{
+      transform:rotate(calc(var(--rot) + 2deg)) translateY(3vh);
+    }
+  }
+
+}
 
 /* ─────────────────────────────
    심해 부유물
@@ -1219,6 +1313,12 @@ body.intro-ready .hud{
 
 <body class="intro-pending">
 
+  <div id="abyss-light" aria-hidden="true">
+  <span class="r1"></span>
+  <span class="r2"></span>
+  <span class="r3"></span>
+  <span class="r4"></span>
+</div>
 
 <!-- 심해 부유물 -->
 
@@ -2926,5 +3026,38 @@ body.intro-ready .hud{
 })();
 </script>
 
+<script>
+(function(){
+
+  var light=document.getElementById('abyss-light'),
+      last=document.querySelector('.account-page'),
+      tick=false;
+
+  if(!light||!last)return;
+
+  function upd(){
+    var top=last.getBoundingClientRect().top,
+        vh=window.innerHeight,
+        t=1-(top/vh);
+
+    light.style.opacity=
+      Math.max(0,Math.min(1,t)).toFixed(3);
+
+    tick=false;
+  }
+
+  window.addEventListener('scroll',function(){
+    if(!tick){
+      tick=true;
+      window.requestAnimationFrame(upd);
+    }
+  },{passive:true});
+
+  window.addEventListener('resize',upd);
+  upd();
+
+})();
+</script>
+  
 </body>
 </html>
