@@ -1121,6 +1121,137 @@ body.intro-ready .hud{
 
   color:var(--current);
 }
+
+/* ─────────────────────────────
+   -10000m OTHER ACCOUNT
+───────────────────────────── */
+
+.account-page{
+  justify-content:flex-end;
+}
+
+.account-panel{
+  width:100%;
+
+  margin-bottom:7vh;
+}
+
+.account-panel .stamp{
+  margin-bottom:6px;
+}
+
+.account-panel .zone{
+  margin-bottom:28px;
+}
+
+
+/* 링크 영역 */
+
+.account-panel .account-links{
+  margin-top:0;
+
+  border-top:
+    1px solid var(--hair);
+}
+
+
+.account-links a{
+  display:grid;
+
+  grid-template-columns:
+    6.5rem
+    1fr
+    auto;
+
+  align-items:center;
+
+  gap:18px;
+
+  padding:
+    17px
+    4px;
+
+  border-bottom:
+    1px solid var(--hair);
+
+  color:var(--ink);
+
+  text-decoration:none;
+
+  transition:
+    padding-left .35s ease,
+    color .35s ease,
+    background .35s ease;
+}
+
+
+.account-links a:hover{
+  padding-left:10px;
+
+  color:var(--current);
+
+  background:
+    rgba(255,255,255,.018);
+}
+
+
+.account-name{
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  font-size:.68rem;
+
+  letter-spacing:.22em;
+
+  color:var(--current);
+}
+
+
+.account-address{
+  font-size:.76rem;
+
+  letter-spacing:.08em;
+
+  color:var(--faint);
+}
+
+
+.account-arrow{
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  font-size:.72rem;
+
+  color:var(--faint);
+
+  transition:
+    transform .35s ease,
+    color .35s ease;
+}
+
+
+.account-links a:hover .account-arrow{
+  transform:
+    translate(
+      3px,
+      -3px
+    );
+
+  color:var(--current);
+}
+
+
+/* 하단 문구 */
+
+.account-panel .floor{
+  margin-top:28px;
+
+  padding-top:22px;
+
+  margin-bottom:0;
+}
   
 </style>
 </head>
@@ -1366,90 +1497,93 @@ body.intro-ready .hud{
 </section>
 
 
-  <!-- -10000m -->
+<!-- -10000m -->
 
 <section
-  class="blk"
+  class="blk account-page"
   data-depth="10000"
 >
 
+  <div class="account-panel">
+
+    <p class="stamp">
+      - 1 0 0 0 0 M
+    </p>
 
 
-  <div class="account-links">
-
-  <p class="stamp">
-    - 1 0 0 0 0 M
-  </p>
-    
-  <p class="zone">
-    O T H E R　A C C O U N T
-  </p>
-    
-    <a
-      href="https://x.com/haeillog"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="account-name">
-        X
-      </span>
-
-      <span class="account-address">
-        @haeillog
-      </span>
-
-      <span class="account-arrow">
-        ↗
-      </span>
-    </a>
+    <p class="zone">
+      O T H E R　A C C O U N T
+    </p>
 
 
-    <a
-      href="https://luvlog.me/haeil"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="account-name">
-        LUVLOG
-      </span>
+    <div class="account-links">
 
-      <span class="account-address">
-        luvlog.me/haeil
-      </span>
+      <a
+        href="https://x.com/haeillog"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="account-name">
+          X
+        </span>
 
-      <span class="account-arrow">
-        ↗
-      </span>
-    </a>
+        <span class="account-address">
+          @haeillog
+        </span>
+
+        <span class="account-arrow">
+          ↗
+        </span>
+      </a>
 
 
-    <a
-      href="https://luvinfo.me/haeil"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="account-name">
-        LUVINFO
-      </span>
+      <a
+        href="https://luvlog.me/haeil"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="account-name">
+          LUVLOG
+        </span>
 
-      <span class="account-address">
-        luvinfo.me/haeil
-      </span>
+        <span class="account-address">
+          luvlog.me/haeil
+        </span>
 
-      <span class="account-arrow">
-        ↗
-      </span>
-    </a>
+        <span class="account-arrow">
+          ↗
+        </span>
+      </a>
+
+
+      <a
+        href="https://luvinfo.me/haeil"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="account-name">
+          LUVINFO
+        </span>
+
+        <span class="account-address">
+          luvinfo.me/haeil
+        </span>
+
+        <span class="account-arrow">
+          ↗
+        </span>
+      </a>
+
+    </div>
+
+
+    <p class="floor">
+      O C E A N　E D G E　·　haeil.love
+    </p>
 
   </div>
 
-
-  <p class="floor">
-    O C E A N　E D G E　·　haeil.love
-  </p>
-
 </section>
-
 
 </div>
 
