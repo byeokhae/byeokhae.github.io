@@ -24,10 +24,7 @@
   --current:#5CB0BE;               /* 해일 */
   --dawn:#EBBB7C;                  /* 디유 — 수면의 금빛 */
   --reach:#A9DA7E;                 /* 심해에 닿은 빛 — 연두 */
-  --mapw:min(40vw,440px);          /* 스크롤 완료 후 최종 가로폭 */
-  
-  /* 동적 변화 가로폭 변수 (초기 100vw) */
-  --map-width:100vw;
+  --mapw:min(40vw,440px);          /* 왼쪽 레이아웃 표준 너비 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -44,31 +41,39 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 단면도 레이어 통합: 하나의 레이어만 사용 ── */
-.layer{
-  position:fixed;top:0;bottom:0;left:0;
-  width:var(--map-width);
-  display:flex;align-items:center;justify-content:flex-start;
+/* ── 단일 SVG 레이어 고정 및 축소 애니메이션 ── */
+.map-container{
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  width:100vw; /* 첫 화면에서는 100% 꽉 참 */
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
   pointer-events:none;
   overflow:hidden;
-  /* 가로폭 변화가 툭툭 끊기지 않도록 여유로운 transition 적용 */
-  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 0;
+  /* 스크롤 시 세로는 유지하고 가로 폭만 한 번에 좁아지는 transition (0.8초) */
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: width;
 }
-/* SVG는 높이 고정, 왼쪽 기준 비율 유지 */
-.layer svg{
+
+/* 본문에 도달했을 때 가로 폭이 한 번에 좁아지는 클래스 */
+.map-container.shrunk{
+  width: var(--mapw);
+}
+
+/* 하나의 SVG 단면도가 전체를 지배하므로 어긋남이 완벽히 방지됨 */
+.map-container svg{
   width:100%;
   height:100%;
   max-height:88vh;
 }
 
-#bg{z-index:-5;opacity:var(--bgfade,1)}
-#track{z-index:-3;opacity:var(--fgfade,1)}
-#inst{z-index:-1;opacity:var(--fgfade,1)}
-
 .floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
 
-/* 찰랑이는 수면과 내리쬐는 빛 */
+/* 찰랑이는 수면 */
 .wave{fill:none;stroke:var(--hair);stroke-width:1.1;vector-effect:non-scaling-stroke;
       transform-box:view-box;transform-origin:0 0}
 .wave.lit{stroke:var(--dawn);opacity:.34}
@@ -98,7 +103,7 @@ a:hover{border-color:var(--current)}
       stroke:var(--sea);stroke-width:4;paint-order:stroke;stroke-linejoin:round}
 .read.sm{font-size:10.5px;fill:var(--faint);stroke-width:3.4}
 
-/* 우측 상단에서 비스듬히 내리쬐는 빛 */
+/* 심해조명 이펙트 */
 #warm{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
       opacity:0;transition:opacity .6s ease}
 .warm-in{position:absolute;inset:0}
@@ -165,16 +170,14 @@ a:hover{border-color:var(--current)}
           font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
           letter-spacing:.24em;color:var(--faint)}
 
-/* 지도와 글을 좌우로 가르는 건 넓은 화면에서만 */
+/* 데스크탑 여백 설정 */
 @media (min-width:900px){
   body{padding-left:calc(var(--mapw) + 52px);padding-right:34px}
 }
-/* 좁은 화면에서는 지도가 글 뒤로 들어가고 옅어짐 */
+/* 모바일 및 작은 화면 설정 */
 @media (max-width:899px){
-  .layer{left:0;right:0;width:auto!important}
-  .layer svg{width:min(100%,420px);max-height:82vh}
-  #bg{opacity:calc(var(--bgfade,1) * .5)}
-  #track,#inst{opacity:calc(var(--fgfade,1) * .9)}
+  .map-container{left:0;right:0;width:100%!important}
+  .map-container svg{width:min(100%,420px);max-height:82vh}
 }
 @media (max-width:520px){
   body{padding:0 20px;font-size:13px}
@@ -186,9 +189,10 @@ a:hover{border-color:var(--current)}
 </head>
 <body>
 
-<!-- ── 단일 배경 도면 (preserveAspectRatio로 좌측 고정) ── -->
-<div class="layer" id="bg" aria-hidden="true">
+<!-- ── 단일 통합 SVG 레이어 (배경, 그래프, 경로, 계기가 완벽히 하나로 묶임) ── -->
+<div class="map-container" id="mapContainer" aria-hidden="true">
   <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
+    <!-- 1. 그리드 및 깊이 수치 -->
     <g class="gridline">
       <line x1="76" y1="218" x2="430" y2="218"/>
       <line x1="76" y1="346" x2="430" y2="346"/>
@@ -206,12 +210,12 @@ a:hover{border-color:var(--current)}
       <text x="2" y="733">- 1 0 0 0 0</text>
     </g>
 
-    <!-- 찰랑이는 수면 -->
+    <!-- 2. 수면 파도 -->
     <path class="wave" d="M-20 90 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-    <path class="wave lit" id="litwave"
-          d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <path class="wave lit" id="litwave" d="M-20 93 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
     <text class="lbl" x="330" y="76">해  수  면</text>
 
+    <!-- 3. 해저 지형 단면선 -->
     <path class="floorline"
       d="M76 314 C 92 250, 112 110, 128 54 L 146 82
          C 164 140, 190 250, 216 372 C 244 500, 276 650, 302 762
@@ -221,12 +225,8 @@ a:hover{border-color:var(--current)}
     <text class="lbl opt" x="150" y="40">마 리 아 나  열 도</text>
     <text class="lbl opt" x="352" y="430">태  평  양  판</text>
     <text class="lbl" x="196" y="822">챌 린 저  해 연</text>
-  </svg>
-</div>
 
-<!-- ── 항적 · 정거장 · 두 사람 ── -->
-<div class="layer" id="track" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
+    <!-- 4. 항적 경로 및 정거장 -->
     <path id="route" class="route"
       d="M128 54 L 146 82 C 164 140, 190 250, 216 372
          C 244 500, 276 650, 302 762 L 311 788"/>
@@ -236,12 +236,8 @@ a:hover{border-color:var(--current)}
     <circle class="halo" id="glow" cx="128" cy="54" r="46" opacity=".26"/>
     <circle cx="128" cy="54" r="6" fill="var(--dawn)" id="dyu"/>
     <circle id="hae" cx="311" cy="788" r="7" fill="var(--current)" opacity="0"/>
-  </svg>
-</div>
 
-<!-- ── 계기 ── -->
-<div class="layer" id="inst" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
+    <!-- 5. 실시간 동적 수치 및 포인터 -->
     <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
     <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
     <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
@@ -261,11 +257,11 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ── 0. 메인 커버 섹션 (시작 시 화면 전체를 채웠다가 스크롤 시 좁아짐) ── -->
+  <!-- ── 0. 첫 번째 커버 섹션 ── -->
   <section class="stage" data-depth="0">
   </section>
 
-  <!-- ✏️ 1. 스크롤하면 나타나는 첫 본문 (디유) -->
+  <!-- ✏️ 1. 스크롤 시 나오는 첫 본문 (디유) -->
   <section class="stage" data-depth="0">
     <div class="col">
       <p class="head">
@@ -275,7 +271,7 @@ a:hover{border-color:var(--current)}
         haeil.love
       </p>
       <p class="stamp">+ 0 5 7 0 M · 1 B A R</p>
-      <p class="zone">해  면  위</p>
+      <p class="zone">해  면 {위}</p>
       <h2 style="color:var(--dawn)">디 유</h2>
       <p class="spec">온새벽 · 풀 S급 가이드 · 빛과 대지</p>
       <p class="body">가라앉는 것들을 아는 사람. 끌어올리지 않고 옆에 같이 앉아 있는 쪽을 택한다.</p>
@@ -304,7 +300,7 @@ a:hover{border-color:var(--current)}
   <section class="stage" data-depth="1500">
     <div class="col">
       <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  ·  1 5 1 B A R</p>
-      <p class="zone">점  심  해  층</p>
+      <p class="zone">점  심 {해}  층</p>
       <h2>규 정</h2>
       <div class="rules ok">
         <h3>이런 건 편해요</h3>
@@ -342,7 +338,7 @@ a:hover{border-color:var(--current)}
   <!-- ✏️ 5. 정거장 4 -->
   <section class="stage" data-depth="10935">
     <div class="col">
-      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  ·  1 0 8 6 B A R  · 1 ~ 4 ℃</p>
+      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  · 1 0 8 6 B A R  · 1 ~ 4 ℃</p>
       <p class="zone">초  심  해  대</p>
       <h2 style="color:var(--current)">해 일</h2>
       <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
@@ -379,6 +375,7 @@ a:hover{border-color:var(--current)}
       dyu=document.getElementById('dyu'),
       hae=document.getElementById('hae'),
       stnBox=document.getElementById('stations'),
+      mapContainer=document.getElementById('mapContainer'),
       stages=[].slice.call(document.querySelectorAll('.stage')),
       depths=stages.map(function(s){return +s.dataset.depth}),
       LEN=route.getTotalLength(),
@@ -444,24 +441,17 @@ a:hover{border-color:var(--current)}
   }
 
   function upd(){
-    var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
-
-    /* ── 여유로운 스크롤 반응 속도 조절 ── */
     var scrollY = window.scrollY;
     var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
-    /* 스크롤 범위(2.2배)를 넓혀 천천히 줄어들게 설정 */
-    var transitionProgress = clamp(scrollY / (firstStageHeight * 2.2)); 
 
-    var windowWidth = window.innerWidth;
-    var targetWidth = Math.min(windowWidth * 0.4, 440);
-    
-    if (windowWidth >= 900) {
-      /* 100vw 에서 targetWidth(약 440px)로 가로폭만 부드럽게 축소 */
-      var currentWidth = windowWidth - (windowWidth - targetWidth) * transitionProgress;
-      root.style.setProperty('--map-width', currentWidth + 'px');
+    /* 첫 번째 화면을 지나 스크롤 내려가면 고정 레이어를 440px로 한 번에 좁힘 */
+    if (scrollY > firstStageHeight * 0.1) {
+      mapContainer.classList.add('shrunk');
     } else {
-      root.style.setProperty('--map-width', '100vw');
+      mapContainer.classList.remove('shrunk');
     }
+
+    var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
 
     rd.textContent='- '+pad(Math.round(dep))+' M';
     rd.setAttribute('y',y-12);
@@ -473,9 +463,7 @@ a:hover{border-color:var(--current)}
     caret.setAttribute('transform','translate(0,'+y+')');
 
     var chartIn=clamp((dep-60)/140);
-    root.style.setProperty('--fgfade',chartIn.toFixed(3));
     root.style.setProperty('--sea',seaAt(dep));
-    root.style.setProperty('--bgfade',(chartIn*(1-r*0.45)).toFixed(3));
     route.style.strokeDashoffset=LEN-s.len;
     sub.setAttribute('cx',s.p.x);sub.setAttribute('cy',s.p.y);
     subw.setAttribute('cx',s.p.x);subw.setAttribute('cy',s.p.y);
