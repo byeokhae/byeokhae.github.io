@@ -24,10 +24,9 @@
   --current:#5CB0BE;               /* 해일 */
   --dawn:#EBBB7C;                  /* 디유 — 수면의 금빛 */
   --reach:#A9DA7E;                 /* 심해에 닿은 빛 — 연두 */
-  --mapw:min(40vw,440px);          /* 왼쪽 지도 칸 너비 */
+  --mapw:min(40vw,440px);          /* 스크롤 완료 후 최종 가로폭 */
   
-  /* ➕ 스크롤에 따라 실시간으로 변할 동적 위치/크기 변수 */
-  --map-left:0px;
+  /* 동적 변화 가로폭 변수 (초기 100vw) */
   --map-width:100vw;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -45,28 +44,29 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 지도 칸: 스크롤에 따라 가로 폭 및 위치가 축소됨 ── */
-.layer{position:fixed;top:0;bottom:0;left:0;width:var(--mapw);
-       display:flex;align-items:center;justify-content:center;pointer-events:none}
-.layer svg{width:100%;height:auto;max-height:88vh}
-
-/* 첫 화면용 넓은 조망도 (스크롤 시 여유롭게 줄어듦) */
-#hero{
-  left:var(--map-left);
+/* ── 단면도 레이어 통합: 하나의 레이어만 사용 ── */
+.layer{
+  position:fixed;top:0;bottom:0;left:0;
   width:var(--map-width);
-  z-index:-2;
-  /* ➕ 가로폭 전환이 뚝뚝 끊기지 않고 부드럽고 여유롭게 반응하도록 transition 부여 */
-  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change:left, width;
+  display:flex;align-items:center;justify-content:flex-start;
+  pointer-events:none;
+  overflow:hidden;
+  /* 가로폭 변화가 툭툭 끊기지 않도록 여유로운 transition 적용 */
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: width;
 }
-#hero svg{width:min(100%,1080px);max-height:84vh}
+/* SVG는 높이 고정, 왼쪽 기준 비율 유지 */
+.layer svg{
+  width:100%;
+  height:100%;
+  max-height:88vh;
+}
 
 #bg{z-index:-5;opacity:var(--bgfade,1)}
 #track{z-index:-3;opacity:var(--fgfade,1)}
 #inst{z-index:-1;opacity:var(--fgfade,1)}
 
 .floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
-.surface{stroke:var(--hair);stroke-width:1;vector-effect:non-scaling-stroke}
 
 /* 찰랑이는 수면과 내리쬐는 빛 */
 .wave{fill:none;stroke:var(--hair);stroke-width:1.1;vector-effect:non-scaling-stroke;
@@ -186,52 +186,9 @@ a:hover{border-color:var(--current)}
 </head>
 <body>
 
-<!-- ── 첫 화면: 화면을 가로지르는 조망도 (글 없음, 스크롤 시 좌측으로 줄어듦) ── -->
-<div class="layer" id="hero" aria-hidden="true">
-  <svg viewBox="0 0 720 430" preserveAspectRatio="xMidYMid meet">
-    <g class="gridline">
-      <line x1="60" y1="120" x2="712" y2="120"/>
-      <line x1="60" y1="181" x2="712" y2="181"/>
-      <line x1="60" y1="241" x2="712" y2="241"/>
-      <line x1="60" y1="301" x2="712" y2="301"/>
-      <line x1="60" y1="362" x2="712" y2="362"/>
-      <line x1="60" y1="60"  x2="60"  y2="400"/>
-    </g>
-    <g class="num">
-      <text x="6" y="63">0</text>
-      <text x="6" y="123">- 2 0 0 0</text>
-      <text x="6" y="184">- 4 0 0 0</text>
-      <text x="6" y="244">- 6 0 0 0</text>
-      <text x="6" y="304">- 8 0 0 0</text>
-      <text x="2" y="365">- 1 0 0 0 0</text>
-    </g>
-
-    <!-- 화면 끝에서 끝까지 흐르는 수면 -->
-    <path class="wave" d="M-20 60 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0
-                          t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-    <path class="wave lit" d="M-20 63 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0
-                              t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
-    <text class="lbl" x="612" y="48">해  수  면</text>
-
-    <path class="floorline"
-      d="M60 104 L 96 66 L 128 30 L 162 70 C 198 112, 232 152, 268 198
-         C 296 232, 320 254, 352 266 C 392 282, 428 322, 462 386
-         L 470 396 L 480 376 C 512 320, 544 276, 588 256
-         C 636 236, 672 240, 712 238"/>
-
-    <text class="lbl opt" x="92" y="18">마 리 아 나  열 도</text>
-    <text class="lbl opt" x="560" y="228">태  평  양  판</text>
-    <text class="lbl" x="392" y="414">챌 린 저  해 연</text>
-
-    <circle class="halo" cx="128" cy="30" r="30" opacity=".26"/>
-    <circle cx="128" cy="30" r="4.6" fill="var(--dawn)"/>
-    <circle cx="470" cy="394" r="4" fill="var(--current)" opacity=".4"/>
-  </svg>
-</div>
-
-<!-- ── 배경 도면 ── -->
+<!-- ── 단일 배경 도면 (preserveAspectRatio로 좌측 고정) ── -->
 <div class="layer" id="bg" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
     <g class="gridline">
       <line x1="76" y1="218" x2="430" y2="218"/>
       <line x1="76" y1="346" x2="430" y2="346"/>
@@ -269,7 +226,7 @@ a:hover{border-color:var(--current)}
 
 <!-- ── 항적 · 정거장 · 두 사람 ── -->
 <div class="layer" id="track" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
     <path id="route" class="route"
       d="M128 54 L 146 82 C 164 140, 190 250, 216 372
          C 244 500, 276 650, 302 762 L 311 788"/>
@@ -284,7 +241,7 @@ a:hover{border-color:var(--current)}
 
 <!-- ── 계기 ── -->
 <div class="layer" id="inst" aria-hidden="true">
-  <svg viewBox="0 0 440 900" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 440 900" preserveAspectRatio="xMinYMid slice">
     <line class="now" id="now" x1="76" y1="90" x2="430" y2="90"/>
     <path class="caret" id="caret" d="M58 -6 L74 0 L58 6 Z" transform="translate(0,90)"/>
     <text class="read" id="read" x="82" y="78">- 0 0 0 0 0 M</text>
@@ -304,9 +261,8 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ── 0. 메인 커버 섹션 (글 없이 단면도만 꽉 차서 들어옴) ── -->
+  <!-- ── 0. 메인 커버 섹션 (시작 시 화면 전체를 채웠다가 스크롤 시 좁아짐) ── -->
   <section class="stage" data-depth="0">
-    <!-- 빈 영역으로 두어 메인화면에는 단면도만 보이게 함 -->
   </section>
 
   <!-- ✏️ 1. 스크롤하면 나타나는 첫 본문 (디유) -->
@@ -490,24 +446,21 @@ a:hover{border-color:var(--current)}
   function upd(){
     var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
 
-    /* ── ⚙️ 속도 조절 팁 ───────────────────────────────────────
-       'firstStageHeight * 1.8' 숫자를 높일수록(예: 2.5) 스크롤을 훨씬 더 많이 
-       내려야 완전히 줄어들게 되어 더욱 여유롭고 느긋해집니다.
-    ───────────────────────────────────────────────────────── */
+    /* ── 여유로운 스크롤 반응 속도 조절 ── */
     var scrollY = window.scrollY;
     var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
-    var transitionProgress = clamp(scrollY / (firstStageHeight * 1.8)); 
+    /* 스크롤 범위(2.2배)를 넓혀 천천히 줄어들게 설정 */
+    var transitionProgress = clamp(scrollY / (firstStageHeight * 2.2)); 
 
     var windowWidth = window.innerWidth;
     var targetWidth = Math.min(windowWidth * 0.4, 440);
     
     if (windowWidth >= 900) {
+      /* 100vw 에서 targetWidth(약 440px)로 가로폭만 부드럽게 축소 */
       var currentWidth = windowWidth - (windowWidth - targetWidth) * transitionProgress;
       root.style.setProperty('--map-width', currentWidth + 'px');
-      root.style.setProperty('--map-left', '0px');
     } else {
       root.style.setProperty('--map-width', '100vw');
-      root.style.setProperty('--map-left', '0px');
     }
 
     rd.textContent='- '+pad(Math.round(dep))+' M';
