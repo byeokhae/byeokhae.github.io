@@ -2955,5 +2955,111 @@ body.intro-ready .hud{
 })();
 </script>
 
+<script>
+(function(){
+
+  const mobile =
+    window.matchMedia('(max-width:520px)');
+
+  const stations =
+    [...document.querySelectorAll('[data-depth]')];
+
+  let timer;
+  let snapping = false;
+
+
+  function snapToStation(){
+
+    if(!mobile.matches || snapping){
+      return;
+    }
+
+    const now =
+      window.scrollY;
+
+    let nearest =
+      stations[0];
+
+    let distance =
+      Infinity;
+
+
+    stations.forEach(function(section){
+
+      const gap =
+        Math.abs(
+          section.offsetTop - now
+        );
+
+      if(gap < distance){
+
+        distance = gap;
+        nearest = section;
+
+      }
+
+    });
+
+
+    if(distance < 3){
+      return;
+    }
+
+
+    snapping = true;
+
+
+    window.scrollTo({
+
+      top:
+        nearest.offsetTop,
+
+      behavior:
+        'smooth'
+
+    });
+
+
+    setTimeout(function(){
+
+      snapping = false;
+
+    }, 650);
+
+  }
+
+
+  window.addEventListener(
+    'scroll',
+
+    function(){
+
+      if(
+        !mobile.matches
+        ||
+        snapping
+      ){
+        return;
+      }
+
+      clearTimeout(timer);
+
+      timer =
+        setTimeout(
+          snapToStation,
+          160
+        );
+
+    },
+
+    {
+      passive:true
+    }
+
+  );
+
+})();
+</script>
+  
 </body>
 </html>
