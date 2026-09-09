@@ -50,12 +50,13 @@ a:hover{border-color:var(--current)}
        display:flex;align-items:center;justify-content:center;pointer-events:none}
 .layer svg{width:100%;height:auto;max-height:88vh}
 
-/* 첫 화면용 넓은 조망도 (스크롤 시 좌측으로 줄어듦) */
+/* 첫 화면용 넓은 조망도 (스크롤 시 여유롭게 줄어듦) */
 #hero{
   left:var(--map-left);
   width:var(--map-width);
   z-index:-2;
-  transition:none;
+  /* ➕ 가로폭 전환이 뚝뚝 끊기지 않고 부드럽고 여유롭게 반응하도록 transition 부여 */
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change:left, width;
 }
 #hero svg{width:min(100%,1080px);max-height:84vh}
@@ -185,7 +186,7 @@ a:hover{border-color:var(--current)}
 </head>
 <body>
 
-<!-- ── 첫 화면: 화면을 가로지르는 조망도 (스크롤 시 좌측으로 줄어듦) ── -->
+<!-- ── 첫 화면: 화면을 가로지르는 조망도 (글 없음, 스크롤 시 좌측으로 줄어듦) ── -->
 <div class="layer" id="hero" aria-hidden="true">
   <svg viewBox="0 0 720 430" preserveAspectRatio="xMidYMid meet">
     <g class="gridline">
@@ -303,7 +304,12 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ✏️ 해면 위 · 디유 -->
+  <!-- ── 0. 메인 커버 섹션 (글 없이 단면도만 꽉 차서 들어옴) ── -->
+  <section class="stage" data-depth="0">
+    <!-- 빈 영역으로 두어 메인화면에는 단면도만 보이게 함 -->
+  </section>
+
+  <!-- ✏️ 1. 스크롤하면 나타나는 첫 본문 (디유) -->
   <section class="stage" data-depth="0">
     <div class="col">
       <p class="head">
@@ -321,7 +327,7 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 1 -->
+  <!-- ✏️ 2. 정거장 1 -->
   <section class="stage" data-depth="200">
     <div class="col">
       <p class="stamp">S T - 0 1  ·  - 0 0 2 0 0 M  ·  2 1 B A R</p>
@@ -338,7 +344,7 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 2 -->
+  <!-- ✏️ 3. 정거장 2 -->
   <section class="stage" data-depth="1500">
     <div class="col">
       <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  ·  1 5 1 B A R</p>
@@ -363,7 +369,7 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 3 -->
+  <!-- ✏️ 4. 정거장 3 -->
   <section class="stage" data-depth="6000">
     <div class="col">
       <p class="stamp">S T - 0 3  ·  - 0 6 0 0 0 M  ·  6 0 3 B A R</p>
@@ -377,10 +383,10 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 4 -->
+  <!-- ✏️ 5. 정거장 4 -->
   <section class="stage" data-depth="10935">
     <div class="col">
-      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  ·  1 0 8 6 B A R  ·  1 ~ 4 ℃</p>
+      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  ·  1 0 8 6 B A R  · 1 ~ 4 ℃</p>
       <p class="zone">초  심  해  대</p>
       <h2 style="color:var(--current)">해 일</h2>
       <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
@@ -395,7 +401,7 @@ a:hover{border-color:var(--current)}
       <div class="tags">
         <span>심해 × 새벽</span><span>각인</span><span>쌍방구원</span><span>느린 연애</span>
       </div>
-      <p class="floorsig">해 저  도  달  ·  haeil.love</p>
+      <p class="floorsig">해 저  도  달  · {haeil.love}</p>
     </div>
   </section>
 
@@ -430,7 +436,6 @@ a:hover{border-color:var(--current)}
   function clamp(v){return v<0?0:v>1?1:v}
   function yOf(dep){return 90+(dep/MAX)*700}
 
-  /* 수심에 따른 물빛. 수면의 푸른빛에서 심해의 검정까지 */
   var TINT=[[0,[18,50,68]],[2000,[10,29,42]],[10935,[3,7,12]]],
       root=document.documentElement;
   function seaAt(dep){
@@ -451,18 +456,21 @@ a:hover{border-color:var(--current)}
     return{len:mid,p:route.getPointAtLength(mid)};
   }
 
-  depths.forEach(function(d,i){
-    if(i===0)return;
-    var s=seek(yOf(d)),
-        c=document.createElementNS(NS,'circle'),
-        t=document.createElementNS(NS,'text');
-    c.setAttribute('cx',s.p.x);c.setAttribute('cy',s.p.y);
-    c.setAttribute('r',5.4);c.setAttribute('class','stn');
-    t.setAttribute('x',s.p.x+11);t.setAttribute('y',s.p.y+4);
-    t.setAttribute('class','stnum');
-    t.textContent='0'+i;
-    stnBox.appendChild(c);stnBox.appendChild(t);
-    marks.push({el:c,d:d});
+  stages.forEach(function(s, idx){
+    if(idx === 0) return;
+    var d = +s.dataset.depth;
+    if(d > 0) {
+      var sPoint = seek(yOf(d)),
+          c = document.createElementNS(NS,'circle'),
+          t = document.createElementNS(NS,'text');
+      c.setAttribute('cx',sPoint.p.x);c.setAttribute('cy',sPoint.p.y);
+      c.setAttribute('r',5.4);c.setAttribute('class','stn');
+      t.setAttribute('x',sPoint.p.x+11);t.setAttribute('y',sPoint.p.y+4);
+      t.setAttribute('class','stnum');
+      t.textContent='0'+(marks.length+1);
+      stnBox.appendChild(c);stnBox.appendChild(t);
+      marks.push({el:c,d:d});
+    }
   });
 
   function depthNow(){
@@ -482,8 +490,14 @@ a:hover{border-color:var(--current)}
   function upd(){
     var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
 
-    /* ── ➕ 메인 화면 -> 좌측 지도 가로폭 축소 애니메이션 (0m ~ 250m 구간) ── */
-    var transitionProgress = clamp(dep / 250); 
+    /* ── ⚙️ 속도 조절 팁 ───────────────────────────────────────
+       'firstStageHeight * 1.8' 숫자를 높일수록(예: 2.5) 스크롤을 훨씬 더 많이 
+       내려야 완전히 줄어들게 되어 더욱 여유롭고 느긋해집니다.
+    ───────────────────────────────────────────────────────── */
+    var scrollY = window.scrollY;
+    var firstStageHeight = stages[0].offsetHeight || window.innerHeight;
+    var transitionProgress = clamp(scrollY / (firstStageHeight * 1.8)); 
+
     var windowWidth = window.innerWidth;
     var targetWidth = Math.min(windowWidth * 0.4, 440);
     
@@ -505,7 +519,6 @@ a:hover{border-color:var(--current)}
     now.style.opacity=(clamp(dep/260)*0.5).toFixed(3);
     caret.setAttribute('transform','translate(0,'+y+')');
 
-    /* 메인 조망도는 사라지지 않고 가로폭이 축소된 채로 좌측에 고정 유지 */
     var chartIn=clamp((dep-60)/140);
     root.style.setProperty('--fgfade',chartIn.toFixed(3));
     root.style.setProperty('--sea',seaAt(dep));
