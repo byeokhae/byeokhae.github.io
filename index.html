@@ -14,17 +14,17 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070E15'/><circle cx='16' cy='16' r='3.5' fill='%235CB0BE'/></svg>">
 
 <style>
-/* ✏️ 색 (이 여섯 줄만 바꾸면 전체가 따라 바뀜) */
+/* ✏️ 색상 및 레이아웃 설정 */
 :root{
   --sea:#0C1723;
   --ink:#B9C9D4;
   --faint:#5E7381;
   --hair:rgba(150,180,196,.30);
   --grid:rgba(150,180,196,.12);
-  --current:#5CB0BE;                /* 해일 */
-  --dawn:#EBBB7C;                   /* 디유 — 수면의 금빛 */
-  --reach:#A9DA7E;                  /* 심해에 닿은 빛 — 연두 */
-  --mapw:min(40vw,440px);           /* 이동 후 지도 칸 너비 */
+  --current:#5CB0BE;                 /* 해일 */
+  --dawn:#EBBB7C;                    /* 디유 — 수면의 금빛 */
+  --reach:#A9DA7E;                   /* 심해에 닿은 빛 — 연두 */
+  --mapw:min(40vw,440px);            /* 왼쪽 지도 칸 너비 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -41,30 +41,18 @@ body{
 a{color:var(--current);text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-color:var(--current)}
 
-/* ── 지도 칸: 기본 첫페이지(화면 전체 넓게) ── */
-.layer{
-  position:fixed;top:0;bottom:0;left:0;right:0;width:100%;
-  display:flex;align-items:center;justify-content:center;pointer-events:none;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.layer svg{width:100%;height:auto;max-height:88vh;transition: width 0.8s ease}
-#bg{z-index:-5;opacity:var(--bgfade,1)}
-#track{z-index:-3}
-#inst{z-index:-1}
+/* ── 지도 칸: 화면 왼쪽에 고정 ── */
+.layer{position:fixed;top:0;bottom:0;left:0;width:var(--mapw);
+       display:flex;align-items:center;justify-content:center;pointer-events:none}
+.layer svg{width:100%;height:auto;max-height:88vh}
 
-/* 스크롤 시 우측으로 가로폭 좁게 이동하는 상태 */
-@media (min-width:900px){
-  body.scrolled .layer {
-    left: auto;
-    right: 34px;
-    width: var(--mapw);
-  }
-  body{
-    padding-left: 52px;
-    padding-right: calc(var(--mapw) + 52px);
-    transition: padding 0.8s ease;
-  }
-}
+/* 첫 화면용 넓은 조망도 */
+#hero{left:0;right:0;width:auto;z-index:-6;opacity:var(--herofade,1)}
+#hero svg{width:min(100%,1080px);max-height:84vh}
+
+#bg{z-index:-5;opacity:var(--bgfade,1)}
+#track{z-index:-3;opacity:var(--fgfade,1)}
+#inst{z-index:-1;opacity:var(--fgfade,1)}
 
 .floorline{fill:none;stroke:var(--hair);stroke-width:1.4;vector-effect:non-scaling-stroke}
 .surface{stroke:var(--hair);stroke-width:1;vector-effect:non-scaling-stroke}
@@ -116,7 +104,7 @@ a:hover{border-color:var(--current)}
   @keyframes reach{0%,100%{opacity:.76}50%{opacity:1}}
 }
 
-/* ── 본문 영역 ── */
+/* ── 오른쪽 본문 ── */
 .wrap{position:relative;z-index:1}
 .stage{min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;
        display:flex;flex-direction:column;justify-content:center;padding:64px 0}
@@ -138,8 +126,6 @@ a:hover{border-color:var(--current)}
 .spec{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.74rem;
       letter-spacing:.16em;color:var(--faint);line-height:2.3;margin-bottom:16px}
 .body{font-size:.87rem;line-height:2.35}
-.go{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
-    letter-spacing:.3em;color:var(--faint);margin-top:40px;opacity:.8}
 
 .info{display:grid;grid-template-columns:6rem 1fr}
 .info dt{color:var(--faint);font-size:.78rem;padding:8px 0;border-bottom:1px solid var(--hair)}
@@ -166,12 +152,16 @@ a:hover{border-color:var(--current)}
           font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:.66rem;
           letter-spacing:.24em;color:var(--faint)}
 
+/* 지도와 글을 좌우로 가르는 건 넓은 화면에서만 */
+@media (min-width:900px){
+  body{padding-left:calc(var(--mapw) + 52px);padding-right:34px}
+}
 /* 좁은 화면에서는 지도가 글 뒤로 들어가고 옅어짐 */
 @media (max-width:899px){
-  .layer{left:0;right:0;width:auto !important}
+  .layer{left:0;right:0;width:auto}
   .layer svg{width:min(100%,420px);max-height:82vh}
   #bg{opacity:calc(var(--bgfade,1) * .5)}
-  #track{opacity:.85}
+  #track,#inst{opacity:calc(var(--fgfade,1) * .9)}
 }
 @media (max-width:520px){
   body{padding:0 20px;font-size:13px}
@@ -182,6 +172,49 @@ a:hover{border-color:var(--current)}
 </style>
 </head>
 <body>
+
+<!-- ── 첫 화면: 화면을 가로지르는 조망도 ── -->
+<div class="layer" id="hero" aria-hidden="true">
+  <svg viewBox="0 0 720 430" preserveAspectRatio="xMidYMid meet">
+    <g class="gridline">
+      <line x1="60" y1="120" x2="712" y2="120"/>
+      <line x1="60" y1="181" x2="712" y2="181"/>
+      <line x1="60" y1="241" x2="712" y2="241"/>
+      <line x1="60" y1="301" x2="712" y2="301"/>
+      <line x1="60" y1="362" x2="712" y2="362"/>
+      <line x1="60" y1="60"  x2="60"  y2="400"/>
+    </g>
+    <g class="num">
+      <text x="6" y="63">0</text>
+      <text x="6" y="123">- 2 0 0 0</text>
+      <text x="6" y="184">- 4 0 0 0</text>
+      <text x="6" y="244">- 6 0 0 0</text>
+      <text x="6" y="304">- 8 0 0 0</text>
+      <text x="2" y="365">- 1 0 0 0 0</text>
+    </g>
+
+    <!-- 화면 끝에서 끝까지 흐르는 수면 -->
+    <path class="wave" d="M-20 60 q22 -5 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0
+                          t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <path class="wave lit" d="M-20 63 q22 -6 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0
+                              t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <text class="lbl" x="612" y="48">해  수  면</text>
+
+    <path class="floorline"
+      d="M60 104 L 96 66 L 128 30 L 162 70 C 198 112, 232 152, 268 198
+         C 296 232, 320 254, 352 266 C 392 282, 428 322, 462 386
+         L 470 396 L 480 376 C 512 320, 544 276, 588 256
+         C 636 236, 672 240, 712 238"/>
+
+    <text class="lbl opt" x="92" y="18">마 리 아 나  열 도</text>
+    <text class="lbl opt" x="560" y="228">태  평  양  판</text>
+    <text class="lbl" x="392" y="414">챌 린 저  해 연</text>
+
+    <circle class="halo" cx="128" cy="30" r="30" opacity=".26"/>
+    <circle cx="128" cy="30" r="4.6" fill="var(--dawn)"/>
+    <circle cx="470" cy="394" r="4" fill="var(--current)" opacity=".4"/>
+  </svg>
+</div>
 
 <!-- ── 배경 도면 ── -->
 <div class="layer" id="bg" aria-hidden="true">
@@ -258,8 +291,12 @@ a:hover{border-color:var(--current)}
 
 <div class="wrap">
 
-  <!-- ✏️ 해면 위 · 디유 -->
+  <!-- ✏️ 첫 화면: 글씨 없는 빈 수면 공간 (스크롤 유도용) -->
   <section class="stage" data-depth="0">
+  </section>
+
+  <!-- ✏️ 정거장 1 : 인포 (스크롤을 내려야 도착) -->
+  <section class="stage" data-depth="200">
     <div class="col">
       <p class="head">
         <span class="id">닉네임</span>
@@ -267,18 +304,6 @@ a:hover{border-color:var(--current)}
         11°22′N 142°35′E · 마리아나 해구<br>
         haeil.love
       </p>
-      <p class="stamp">+ 0 5 7 0 M · 1 B A R</p>
-      <p class="zone">해  면  위</p>
-      <h2 style="color:var(--dawn)">디 유</h2>
-      <p class="spec">온새벽 · 풀 S급 가이드 · 빛과 대지</p>
-      <p class="body">가라앉는 것들을 아는 사람. 끌어올리지 않고 옆에 같이 앉아 있는 쪽을 택한다.</p>
-      <p class="go">정 거 장  네  곳  ·  아 래 로</p>
-    </div>
-  </section>
-
-  <!-- ✏️ 정거장 1 -->
-  <section class="stage" data-depth="200">
-    <div class="col">
       <p class="stamp">S T - 0 1  ·  - 0 0 2 0 0 M  ·  2 1 B A R</p>
       <p class="zone">표  층</p>
       <h2>인 포</h2>
@@ -293,10 +318,10 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 2 -->
+  <!-- ✏️ 정거장 2 : 규정 -->
   <section class="stage" data-depth="1500">
     <div class="col">
-      <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  · 1 5 1 B A R</p>
+      <p class="stamp">S T - 0 2  ·  - 0 1 5 0 0 M  ·  1 5 1 B A R</p>
       <p class="zone">점  심  해  층</p>
       <h2>규 정</h2>
       <div class="rules ok">
@@ -318,7 +343,7 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 3 -->
+  <!-- ✏️ 정거장 3 : 링크 -->
   <section class="stage" data-depth="6000">
     <div class="col">
       <p class="stamp">S T - 0 3  ·  - 0 6 0 0 0 M  ·  6 0 3 B A R</p>
@@ -332,10 +357,10 @@ a:hover{border-color:var(--current)}
     </div>
   </section>
 
-  <!-- ✏️ 정거장 4 -->
+  <!-- ✏️ 정거장 4 : 해일 -->
   <section class="stage" data-depth="10935">
     <div class="col">
-      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  · 1 0 8 6 B A R  · 1 ~ 4 ℃</p>
+      <p class="stamp">S T - 0 4  ·  - 1 0 9 3 5 M  ·  1 0 8 6 B A R  ·  1 ~ 4 ℃</p>
       <p class="zone">초  심  해  대</p>
       <h2 style="color:var(--current)">해 일</h2>
       <p class="spec">한바다 · SS급 센티넬 · 물의 군주</p>
@@ -366,7 +391,6 @@ a:hover{border-color:var(--current)}
       route=document.getElementById('route'),
       sub=document.getElementById('sub'),
       subw=document.getElementById('subw'),
-      warm=document.getElementById('warm'),
       litwave=document.getElementById('litwave'),
       now=document.getElementById('now'),
       glow=document.getElementById('glow'),
@@ -438,13 +462,6 @@ a:hover{border-color:var(--current)}
   function upd(){
     var dep=depthNow(),r=dep/MAX,y=yOf(dep),s=seek(y);
 
-    /* 첫 번째 구간(수면 위)을 벗어나면 지도를 우측으로 이동시키는 클래스 toggle */
-    if(dep > 50) {
-      document.body.classList.add('scrolled');
-    } else {
-      document.body.classList.remove('scrolled');
-    }
-
     rd.textContent='- '+pad(Math.round(dep))+' M';
     rd.setAttribute('y',y-12);
     rp.textContent=String(Math.round(1+dep*0.0992)).split('').join(' ')+' B A R';
@@ -455,8 +472,12 @@ a:hover{border-color:var(--current)}
     now.style.opacity=(clamp(dep/260)*0.5).toFixed(3);
     caret.setAttribute('transform','translate(0,'+y+')');
 
+    /* 첫 화면의 조망도에서 작업용 도면으로 넘어감 */
+    var chartIn=clamp((dep-60)/140);
+    root.style.setProperty('--herofade',clamp(1-dep/140).toFixed(3));
+    root.style.setProperty('--fgfade',chartIn.toFixed(3));
     root.style.setProperty('--sea',seaAt(dep));
-    root.style.setProperty('--bgfade',(1-r*0.45).toFixed(3));
+    root.style.setProperty('--bgfade',(chartIn*(1-r*0.45)).toFixed(3));
     route.style.strokeDashoffset=LEN-s.len;
     sub.setAttribute('cx',s.p.x);sub.setAttribute('cy',s.p.y);
     subw.setAttribute('cx',s.p.x);subw.setAttribute('cy',s.p.y);
